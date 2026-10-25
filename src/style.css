@@ -229,3 +229,7 @@ aside section h3, .dayhead h4, .refgrid section h3,
 @media print {
   .night-two-line::after { top:55px; }
 }
+
+/* Keep the small gold star only in the evening reflection area.
+   Remove automatically added star ornaments from the left sidebar cards. */
+aside section::after { content:none !important; display:none !important; }
