@@ -119,3 +119,34 @@ footer, input, textarea { font-family: var(--jp-textbook); }
   aside section h3, .dayhead h4, .refgrid section h3,
   .reflection h2, .actions>b { font-family: var(--jp-textbook-bold) !important; }
 }
+
+/* Accessible Japanese text on Chromebook: avoid thin Mincho fallback.
+   Use installed UD textbook faces when available; otherwise readable sans-serif. */
+:root {
+  --jp-textbook: "UD Digi Kyokasho N-R", "UD デジタル 教科書体 N-R",
+    "UD デジタル 教科書体", "UD Digi Kyokasho",
+    "BIZ UDPGothic", "BIZ UDゴシック", "Noto Sans CJK JP",
+    "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic",
+    "Meiryo", sans-serif;
+  --jp-textbook-bold: "UD Digi Kyokasho N-B", "UD デジタル 教科書体 N-B",
+    "UD デジタル 教科書体", "UD Digi Kyokasho",
+    "BIZ UDPGothic", "BIZ UDゴシック", "Noto Sans CJK JP",
+    "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic",
+    "Meiryo", sans-serif;
+}
+body, aside p, aside small, .dayhead p, .night, .actions input,
+.hour input, .night input, .refgrid textarea, footer, input, textarea {
+  font-family: var(--jp-textbook);
+  color: #293e58;
+}
+aside section h3, .dayhead h4, .refgrid section h3,
+.reflection h2, .actions>b {
+  font-family: var(--jp-textbook-bold);
+  font-weight: 700;
+  color: #293e58;
+}
+@media print {
+  body, input, textarea { font-family: var(--jp-textbook) !important; color:#293e58; }
+  aside section h3, .dayhead h4, .refgrid section h3,
+  .reflection h2, .actions>b { font-family: var(--jp-textbook-bold) !important; }
+}
