@@ -37,3 +37,22 @@ aside section h3,.reflection h2{color:#2f496b;letter-spacing:.25px}
 footer{background:#fffdf7aa}
 @page{size:A4 landscape;margin:0}
 @media print{.sheet{width:1480px;height:1010px;min-height:1010px;transform:scale(.748);zoom:1;transform-origin:top left;box-shadow:none;margin:0;break-inside:avoid}html,body{width:297mm;height:210mm;overflow:hidden}.sheet,aside section,.week,.reflection,.actions{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+/* Vector moonlight and botanical stationery: editable content remains above art. */
+.mast{isolation:isolate;background:#e3edf1}
+.mast-art{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.mast:before,.mast:after{display:none}
+.mast h1{position:relative;font-size:29px;line-height:1.02;text-shadow:0 1px 2px #fff,0 0 7px #fff}
+.mast small{position:relative;font-size:13px}
+aside section{overflow:hidden}
+aside section>p,aside section>small,aside section>label,aside section>h3{position:relative;z-index:1}
+.dayhead p{font-size:13px;line-height:1.4}
+.night{font-size:12px}
+.refgrid section h3{font-size:14px}
+.hour input{font-size:12px}
+.wheel svg{display:block;width:100%;height:auto;aspect-ratio:1/1}
+@media print{
+ .mast-art{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+ .sheet{transform:scale(.748)!important;zoom:1!important;overflow:hidden}
+ .hour input,.night input,.actions input,.refgrid textarea{overflow:hidden}
+}
