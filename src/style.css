@@ -56,3 +56,40 @@ aside section>p,aside section>small,aside section>label,aside section>h3{positio
  .sheet{transform:scale(.748)!important;zoom:1!important;overflow:hidden}
  .hour input,.night input,.actions input,.refgrid textarea{overflow:hidden}
 }
+
+/* A4 landscape: match the physical page aspect ratio and enlarge printed text.
+   1480 CSS px × 1047 CSS px at 0.758 = 297 × 210 mm (96dpi).
+   This overrides the earlier 0.748 scale without affecting the web editor. */
+@media print {
+  @page { size: 297mm 210mm; margin: 0; }
+  html, body { width: 297mm !important; height: 210mm !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; }
+  .toolbar { display: none !important; }
+  .sheet {
+    width: 1480px !important;
+    height: 1047px !important;
+    min-height: 1047px !important;
+    margin: 0 !important;
+    transform: scale(.758) !important;
+    transform-origin: top left !important;
+    zoom: 1 !important;
+    box-shadow: none !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    overflow: hidden !important;
+  }
+  .dayhead { height: 218px; }
+  .hour { height: 20px; }
+  .hour time { font-size: 12px; width: 37px; }
+  .hour input { font-size: 14px; }
+  .dayhead p { font-size: 14px; line-height: 1.35; }
+  .dayhead h4 { font-size: 15px; }
+  aside p, .check { font-size: 14px; }
+  aside small, .notice { font-size: 12px; }
+  .night { font-size: 13px; }
+  .night input { font-size: 13px; }
+  .actions input { font-size: 14px; }
+  .refgrid section h3 { font-size: 15px; }
+  .refgrid textarea { font-size: 14px; }
+  footer { font-size: 13px; }
+  .sheet, .sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
