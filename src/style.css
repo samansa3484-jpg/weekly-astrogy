@@ -353,3 +353,33 @@ aside section::after { content:none !important; display:none !important; }
   .night-question {flex-basis:27px;min-height:27px;max-height:27px}
   .night-writing::before,.night-writing::after{top:43% !important}
 }
+
+/* Layout preview: three sample celestial-event cards per week.
+   Reserve equal space every day so the 05:00–23:00 schedule stays aligned. */
+.dayhead { height:218px; padding:7px 5px 5px; }
+.dayhead>span { font-size:18px; line-height:22px; }
+.event-slot { height:55px; display:flex; align-items:center; justify-content:center; }
+.astro-event {
+  width:100%;
+  max-width:132px;
+  min-height:48px;
+  border:1px solid #c9b89b;
+  border-radius:5px;
+  background:linear-gradient(125deg,#f5f1e8,#eaf1f2);
+  padding:3px 2px;
+  color:#3c5165;
+  text-align:center;
+  line-height:1.25;
+}
+.astro-event-title { font-size:10px; font-weight:700; white-space:nowrap; }
+.astro-event-title span { color:#b39768; font-size:12px; }
+.astro-event-meaning { font-size:9px; }
+.astro-event small { display:block; font-size:8px; color:#866e5d; line-height:1.2; }
+.dayhead h4 { margin:3px 0 4px; padding-bottom:4px; min-height:30px; font-size:13px; }
+.dayhead p { margin:5px 0 0; line-height:1.4; }
+@media print {
+ .dayhead { height:218px; padding:7px 5px 5px; }
+ .event-slot {height:55px}
+ .astro-event {print-color-adjust:exact;-webkit-print-color-adjust:exact}
+ .dayhead h4 {margin:3px 0 4px;padding-bottom:4px;min-height:30px}
+}
