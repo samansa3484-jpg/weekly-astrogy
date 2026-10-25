@@ -93,3 +93,29 @@ aside section>p,aside section>small,aside section>label,aside section>h3{positio
   footer { font-size: 13px; }
   .sheet, .sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* Japanese stationery typography: use locally installed UD Digital Kyokasho.
+   No font files are bundled or distributed; fallback remains readable. */
+:root {
+  --jp-textbook: "UD Digi Kyokasho N-R", "UD デジタル 教科書体 N-R",
+    "UD デジタル 教科書体", "UD Digi Kyokasho",
+    "Yu Kyokasho", "游教科書体", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --jp-textbook-bold: "UD Digi Kyokasho N-B", "UD デジタル 教科書体 N-B",
+    "UD デジタル 教科書体", "UD Digi Kyokasho",
+    "Yu Kyokasho", "游教科書体", "Hiragino Mincho ProN", "Yu Mincho", serif;
+}
+body { font-family: var(--jp-textbook); }
+.toolbar { font-family: var(--jp-textbook); }
+.mast h1 { font-family: Georgia, "Times New Roman", serif; }
+.hour time, .date { font-family: Georgia, "Times New Roman", serif; }
+aside section h3, .dayhead h4, .refgrid section h3,
+.reflection h2, .actions>b { font-family: var(--jp-textbook-bold); font-weight: 700; }
+aside p, aside small, .dayhead p, .night,
+.actions input, .hour input, .night input, .refgrid textarea,
+footer, input, textarea { font-family: var(--jp-textbook); }
+@media print {
+  body, input, textarea { font-family: var(--jp-textbook) !important; }
+  .mast h1, .hour time, .date { font-family: Georgia, "Times New Roman", serif !important; }
+  aside section h3, .dayhead h4, .refgrid section h3,
+  .reflection h2, .actions>b { font-family: var(--jp-textbook-bold) !important; }
+}
