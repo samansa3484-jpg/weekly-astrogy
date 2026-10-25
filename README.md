@@ -20,3 +20,13 @@
 3. 週の切り替え機能を追加する
 4. 天体計算と正確なホロスコープを実装する
 5. 週間テーマと問いの更新機能を追加する
+
+## GitHub Pages 公開
+
+公開予定URL: https://samansa3484-jpg.github.io/weekly-astrogy/
+
+1. Settings → Pages → Build and deployment → Source を **GitHub Actions** に設定します。
+2. `main` ブランチにデプロイ用ワークフローを取り込むと、Actions から自動公開されます。
+3. 公開後、上記URLで画面表示、入力保存、A4横向き印刷を確認してください。
+
+注意: 保存内容は使用ブラウザの localStorage に保持され、端末間では同期されません。天体情報とホロスコープは未検証の仮表示です。
