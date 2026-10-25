@@ -163,3 +163,8 @@ aside section h3, .dayhead h4, .refgrid section h3,
     "UD Digi Kyokasho N-B", "UD デジタル 教科書体 N-B",
     "BIZ UDPGothic", "Noto Sans JP", sans-serif;
 }
+
+/* Keep short Japanese prompts visually balanced without shrinking type. */
+.dayhead p,.night{ text-wrap:balance; overflow-wrap:normal; word-break:normal; line-break:strict; }
+.night input{display:block;margin-top:4px}
+@media print{.dayhead p,.night{text-wrap:balance;line-break:strict}}
