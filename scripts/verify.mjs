@@ -1,0 +1,20 @@
+import { chromium } from 'playwright';
+import fs from 'node:fs';
+const browser = await chromium.launch({headless:true});
+const page = await browser.newPage({viewport:{width:1600,height:1100},deviceScaleFactor:1});
+await page.goto('http://127.0.0.1:4173/',{waitUntil:'networkidle'});
+await page.screenshot({path:'artifacts/screen.png',fullPage:true});
+const checks=await page.evaluate(()=>{
+ const sheet=document.querySelector('.sheet');
+ const week=document.querySelector('.week');
+ const wheel=document.querySelector('.wheel');
+ const rect=wheel.getBoundingClientRect();
+ const labels=[...document.querySelectorAll('.hour time')].map(x=>x.textContent);
+ return {title:document.title,days:week.children.length,hourLabels:labels.length,firstHour:labels[0],lastHour:labels[labels.length-1],reflectionSections:document.querySelectorAll('.refgrid section').length,wheelWidth:rect.width,wheelHeight:rect.height,sheetWidth:sheet.getBoundingClientRect().width};
+});
+fs.writeFileSync('artifacts/checks.json',JSON.stringify(checks,null,2));
+if(checks.days!==7||checks.hourLabels!==133||checks.firstHour!=='05:00'||checks.lastHour!=='23:00'||checks.reflectionSections!==4||Math.abs(checks.wheelWidth-checks.wheelHeight)>1)throw Error('Layout checks failed: '+JSON.stringify(checks));
+await page.emulateMedia({media:'print'});
+await page.pdf({path:'artifacts/a4-landscape.pdf',format:'A4',landscape:true,printBackground:true,preferCSSPageSize:true});
+await browser.close();
+console.log(checks);
