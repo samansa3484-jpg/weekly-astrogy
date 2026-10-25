@@ -303,3 +303,53 @@ aside section::after { content:none !important; display:none !important; }
   .night-question { font-size:12px; flex-basis:38px; }
   .night-writing textarea { font-size:12px; line-height:23px; }
 }
+
+/* Consistent two-line evening journal: rules above and below the second row.
+   All seven gold stars sit at the RIGHT end of the upper writing rule. */
+.night { height:100px; min-height:100px; padding:6px 6px 5px; }
+.night-question {
+  flex:0 0 27px;
+  min-height:27px;
+  max-height:27px;
+  font-size:12px;
+  line-height:1.3;
+}
+.night-writing { position:relative; flex:1 1 auto; min-height:0; }
+.night-writing::before {
+  content:"" !important;
+  display:block !important;
+  position:absolute;
+  left:0;
+  right:0;
+  top:43%;
+  height:1px;
+  border:0;
+  background:repeating-linear-gradient(to right,#aebfc7 0 2px,transparent 2px 4px);
+  pointer-events:none;
+}
+.night-writing::after {
+  content:"✧" !important;
+  display:block !important;
+  position:absolute !important;
+  left:auto !important;
+  right:0 !important;
+  top:43% !important;
+  bottom:auto !important;
+  transform:translateY(-50%) !important;
+  color:#c6a776;
+  font-size:16px;
+  line-height:1;
+  background:#fffdf8;
+  pointer-events:none;
+}
+.night-writing textarea {
+  background:linear-gradient(to bottom,transparent calc(90% - 1px),#aebfc7 90%,transparent calc(90% + 1px)) !important;
+  padding:1px 15px 1px 2px;
+  line-height:22px;
+  overflow:hidden;
+}
+@media print {
+  .night {height:100px;min-height:100px}
+  .night-question {flex-basis:27px;min-height:27px;max-height:27px}
+  .night-writing::before,.night-writing::after{top:43% !important}
+}
