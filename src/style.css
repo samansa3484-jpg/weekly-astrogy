@@ -206,3 +206,26 @@ aside section h3, .dayhead h4, .refgrid section h3,
   .night-question { font-size:13px; line-height:1.45; min-height:38px; }
   .night input { font-size:13px; height:23px; }
 }
+
+/* Center the existing gold star in the quiet space below two-line prompts.
+   Keep it behind the writing field and clear of text. */
+.night-two-line { position:relative; }
+.night-two-line::after {
+  content:"✧";
+  position:absolute;
+  left:50%;
+  right:auto;
+  top:52px;
+  bottom:auto;
+  transform:translateX(-50%);
+  color:#c6a776;
+  font-size:17px;
+  line-height:1;
+  pointer-events:none;
+  opacity:.8;
+}
+.night-two-line .night-question { position:relative;z-index:1; }
+.night-two-line input { position:relative;z-index:1; }
+@media print {
+  .night-two-line::after { top:55px; }
+}
