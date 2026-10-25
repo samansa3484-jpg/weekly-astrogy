@@ -233,3 +233,73 @@ aside section h3, .dayhead h4, .refgrid section h3,
 /* Keep the small gold star only in the evening reflection area.
    Remove automatically added star ornaments from the left sidebar cards. */
 aside section::after { content:none !important; display:none !important; }
+
+/* Evening reflections: two writable rows, with the gold star at the right end
+   of the central ruled line on every day. */
+.night {
+  position:relative;
+  height:94px;
+  min-height:94px;
+  padding:8px 6px 5px;
+  gap:0;
+  display:flex;
+  flex-direction:column;
+}
+.night::after,.night-two-line::after {
+  content:none !important;
+  display:none !important;
+}
+.night-question {
+  min-height:32px;
+  max-height:38px;
+  line-height:1.4;
+  font-size:12px;
+  flex:0 0 38px;
+}
+.night-writing {
+  position:relative;
+  flex:1;
+  min-height:0;
+  width:100%;
+}
+.night-writing::before {
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:50%;
+  border-top:1px dotted #aebfc7;
+  pointer-events:none;
+}
+.night-writing::after {
+  content:"✧";
+  position:absolute;
+  right:0;
+  top:50%;
+  transform:translateY(-50%);
+  color:#c6a776;
+  font-size:16px;
+  line-height:1;
+  background:#fffdf8;
+  pointer-events:none;
+}
+.night-writing textarea {
+  position:relative;
+  display:block;
+  width:100%;
+  height:100%;
+  margin:0;
+  padding:2px 14px 2px 2px;
+  border:0;
+  background:transparent;
+  resize:none;
+  outline-offset:1px;
+  font:12px/23px var(--jp-textbook);
+  color:#293e58;
+  z-index:1;
+}
+@media print {
+  .night { height:94px; min-height:94px; }
+  .night-question { font-size:12px; flex-basis:38px; }
+  .night-writing textarea { font-size:12px; line-height:23px; }
+}
