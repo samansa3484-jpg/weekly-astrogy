@@ -457,9 +457,9 @@ aside section::after { content:none !important; display:none !important; }
   .hour{flex-basis:20px;min-height:20px;}
 }
 
-/* Muted aspect colors echo the planner's blue, rose and gold palette. */
-.aspect-soft{--aspect-color:#7796ac;}
-.aspect-hard{--aspect-color:#aa7775;}
+/* Clear watercolor blue and coral retain the planner's gentle palette. */
+.aspect-soft{--aspect-color:#58a9c0;}
+.aspect-hard{--aspect-color:#d5787c;}
 .aspect-conjunction{--aspect-color:#b69b68;}
 .chart-aspects>g{stroke:var(--aspect-color);}
 
