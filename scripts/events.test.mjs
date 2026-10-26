@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import * as Astronomy from 'astronomy-engine';
-import {weeklyEvents,eventsForJstDay,jstInstant,compactEventLabel} from '../src/events.ts';
+import {weeklyEvents,eventsForJstDay,jstInstant,compactEventLabel,timelineForDay,jstClock} from '../src/events.ts';
 const week=new Date('2026-10-26T00:00:00Z');
 const events=weeklyEvents(week);
 test('JST day boundaries include midnight once and exclude the next midnight',()=>{
@@ -39,4 +39,13 @@ test('planetary ingresses are real sign changes and use JST when grouped',()=>{
  assert.equal(signAt(ingress.date.getTime()-60000),10);
  assert.equal(signAt(ingress.date.getTime()+60000),11);
  assert.ok(eventsForJstDay([ingress],date,3).includes(ingress));
+});
+
+test('timeline retains every event and keeps pre-5am events outside the displayed hours',()=>{
+ const input=[0,4,5,13,13+59/60,23+59/60].map((hour,index)=>({date:new Date(jstInstant(week,0).getTime()+Math.round(hour*3600000)),label:String(index),symbol:'□',kind:'aspect'}));
+ const timeline=timelineForDay(input);
+ assert.equal(timeline.beforeHours.length,2);assert.equal(timeline.hours.length,19);
+ assert.equal(timeline.hours[0].length,1);assert.equal(timeline.hours[8].length,2);assert.equal(timeline.hours[18].length,1);
+ assert.equal(new Set([...timeline.beforeHours,...timeline.hours.flat()]).size,input.length);
+ assert.deepEqual(jstClock(input[4].date),{hour:13,minute:59});
 });
