@@ -448,3 +448,11 @@ aside section::after { content:none !important; display:none !important; }
   .symbol .planet-positions{grid-template-columns:1fr;align-content:center;gap:2px;font-size:10px;margin:4px 0;}
   .symbol>small{grid-column:1/-1;font-size:9px;line-height:1.2;}
 }
+
+/* Symbolic day reads like a compact planner caption. */
+.symbolic-event{display:flex;justify-content:center;align-items:baseline;flex-wrap:wrap;gap:2px 7px;line-height:1.5;}
+.symbolic-event time,.symbolic-event-name{font-size:12px;font-weight:600;}
+.symbol p.symbolic-meaning{font-size:12px;line-height:1.5;margin:2px 0 6px;}
+@media print{
+  .symbolic-event time,.symbolic-event-name,.symbol p.symbolic-meaning{font-size:11px;}
+}
