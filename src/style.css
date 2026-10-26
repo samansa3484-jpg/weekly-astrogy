@@ -589,3 +589,9 @@ aside section::after { content:none !important; display:none !important; }
 .before-hours-event small{font-size:8px;color:#7b7e79;}
 .before-hours-event .timeline-event{font-size:12px;}
 .hour>time{align-self:flex-start;line-height:14px;}
+
+/* A narrow botanical margin keeps the illustration clear of every written line. */
+.weekly-good-for{padding-right:52px;background-image:url('./assets/botanical-sprig.svg'),linear-gradient(130deg,#fffdf9e8,#fcf9efe0);background-repeat:no-repeat;background-position:right 4px bottom 5px,0 0;background-size:38px calc(100% - 37px),100% 100%;}
+.weekly-good-for h3{margin-right:-38px;}
+.weekly-good-for:after{display:none;}
+@media print{.weekly-good-for{padding-right:52px;}}
