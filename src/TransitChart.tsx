@@ -1,7 +1,21 @@
 import * as Astronomy from 'astronomy-engine';
 
 const signs = ['牡羊座','牡牛座','双子座','蟹座','獅子座','乙女座','天秤座','蠍座','射手座','山羊座','水瓶座','魚座'];
-const glyphs = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+// Vector strokes avoid platform emoji fonts and always inherit the text color.
+const zodiacPaths = [
+  'M12 21V10C12 1 2 1 3 8C4 13 8 11 8 8M12 10C12 1 22 1 21 8C20 13 16 11 16 8',
+  'M4 2C4 11 20 11 20 2M18 15A6 6 0 1 1 6 15A6 6 0 1 1 18 15',
+  'M4 3Q12 7 20 3M4 21Q12 17 20 21M8 5V19M16 5V19',
+  'M4 9C8 2 18 3 21 7M9 9A3 3 0 1 1 3 9A3 3 0 1 1 9 9M20 15C16 22 6 21 3 17M21 15A3 3 0 1 1 15 15A3 3 0 1 1 21 15',
+  'M9 15A4 4 0 1 1 1 15A4 4 0 1 1 9 15M8 12C3 1 18 0 18 8C18 13 11 17 15 21C18 24 22 20 22 17',
+  'M2 5V19M2 9C2 4 7 4 7 9V19M7 9C7 4 12 4 12 9V19M12 9C12 4 17 4 17 9V15C17 20 21 22 23 22M15 22C22 19 24 10 20 9C15 7 15 17 23 19',
+  'M3 20H21M3 15H8A6 6 0 1 1 16 15H21',
+  'M2 5V19M2 9C2 4 7 4 7 9V19M7 9C7 4 12 4 12 9V19M12 9C12 4 17 4 17 9V17Q17 21 22 19M19 16L22 19L19 22',
+  'M4 21L21 4M12 4H21V13M5 10L14 19',
+  'M2 8L5 5L9 19L13 5Q18 8 16 15C12 25 25 22 22 16C19 11 12 18 9 21',
+  'M2 9L6 5L10 9L14 5L18 9L22 5M2 19L6 15L10 19L14 15L18 19L22 15',
+  'M5 2C11 8 11 16 5 22M19 2C13 8 13 16 19 22M3 12H21',
+];
 const bodies = [
   [Astronomy.Body.Sun,'太陽','☉'], [Astronomy.Body.Moon,'月','☽'],
   [Astronomy.Body.Mercury,'水星','☿'], [Astronomy.Body.Venus,'金星','♀'],
@@ -37,7 +51,7 @@ export default function TransitChart({date,label}:{date:Date;label:string}) {
     <div className="wheel transit-wheel"><svg viewBox="0 0 240 240" width="100%" height="100%" role="img" aria-label={`${timestamp}の天体配置。牡羊座0度を左に固定した地心黄道図`}>
       <circle cx="120" cy="120" r="115" fill="#fffdf5" stroke="#b69b68"/>
       <circle cx="120" cy="120" r="89" fill="none" stroke="#c9bb9a"/>
-      {glyphs.map((glyph,i) => {const a=point(i*30,89),b=point(i*30,115),t=point(i*30+15,102);return <g key={glyph}><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#c9b58c"/><text x={t.x} y={t.y} textAnchor="middle" dominantBaseline="central" fontSize="15" fill="currentColor" style={{fontVariantEmoji:'text',fontFamily:'"Segoe UI Symbol", "Apple Symbols", "DejaVu Sans", sans-serif'}}>{glyph+'\uFE0E'}</text></g>})}
+      {zodiacPaths.map((path,i) => {const a=point(i*30,89),b=point(i*30,115),t=point(i*30+15,102);return <g key={signs[i]}><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#c9b58c"/><g data-zodiac={signs[i]} transform={`translate(${t.x-7.5} ${t.y-7.5}) scale(.625)`} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><title>{signs[i]}</title><path d={path}/></g></g>})}
       {plotted.map(p => {const a=point(p.longitude,86),b=point(p.longitude,p.radius+7),t=point(p.longitude,p.radius);return <g key={p.name} data-planet={p.name} data-longitude={p.longitude}><title>{p.name}：{p.description}</title><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#b69b68" strokeWidth=".6"/><text x={t.x} y={t.y} textAnchor="middle" dominantBaseline="central" fontSize="14" fill="#34465d">{p.symbol}</text></g>})}
     </svg></div>
     <dl className="planet-positions">{positions.map(p=><div key={p.name}><dt>{p.symbol} {p.name}</dt><dd>{p.description}</dd></div>)}</dl>
