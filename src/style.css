@@ -421,3 +421,7 @@ aside section::after { content:none !important; display:none !important; }
 .moon-sign {height:27px;min-height:27px}
 .dayhead h4 {margin-top:5px}
 @media print {.date-line{height:32px}.moon-sign{height:27px;min-height:27px}}
+
+/* Give the date and English weekday a deliberate, quiet visual separation. */
+.date-line { gap:7px; }
+@media print { .date-line {gap:7px} }
