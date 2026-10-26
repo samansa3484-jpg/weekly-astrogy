@@ -537,3 +537,23 @@ aside section::after { content:none !important; display:none !important; }
   aside{gap:4px;}
   .mast{height:92px;min-height:92px;}
 }
+
+/* Backup controls are kept off the printed planner. */
+.toolbar{flex-wrap:wrap;gap:8px 14px;}
+.backup-dialog{width:min(560px,calc(100vw - 32px));max-height:85vh;overflow:auto;border:1px solid #b9c7cf;border-radius:12px;padding:22px;color:#293e58;background:#fffdf7;font:14px/1.6 var(--jp-textbook);}
+.backup-dialog::backdrop{background:#293e5866;}
+.backup-dialog h2{font-size:20px;margin:0 0 8px;}
+.backup-dialog h3{text-align:left;font-size:15px;}
+.backup-dialog section{border-top:1px solid #d8d5c9;margin-top:16px;padding-top:14px;}
+.backup-dialog p{margin:6px 0 12px;}
+.backup-dialog button{border:0;border-radius:7px;padding:9px 14px;background:#405879;color:white;cursor:pointer;}
+.backup-dialog button:disabled{opacity:.45;cursor:default;}
+.backup-file{display:block;}
+.backup-file input{display:block;max-width:100%;margin-top:6px;font:inherit;}
+.backup-preview{margin-top:12px;padding:12px;border-radius:8px;background:#eaf0ef;}
+.backup-preview fieldset{border:1px solid #c6d1d4;margin:10px 0;padding:8px;}
+.backup-preview fieldset label,.backup-confirm{display:block;margin:6px 0;}
+.backup-confirm{padding:6px;}
+.backup-message{border-left:3px solid #b69b68;padding:8px 12px;background:#f6f0e3;}
+.backup-dialog .backup-note{font-size:12px;color:#56646a;}
+@media print{.backup-dialog,.backup-dialog::backdrop{display:none!important;}}
