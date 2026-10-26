@@ -610,5 +610,12 @@ aside section::after { content:none !important; display:none !important; }
 .mast-art{display:none;}
 .mast h1{margin-right:27px;}
 
-/* Lower-left chart corner: narrow botanical strokes and quiet gold stars. */
-aside section.symbol{background-image:url('./assets/botanical-sprig.svg'),url('./assets/gold-stars.svg'),linear-gradient(130deg,#fffdf9e8,#fcf9efe0);background-size:35px 114px,18px 78px,100% 100%;background-position:left 4px bottom 5px,left 42px bottom 9px,0 0;background-repeat:no-repeat;}
+/* Botanical corners frame the wheel without covering its axes or labels. */
+aside section.symbol{background:linear-gradient(130deg,#fffdf9e8,#fcf9efe0);}
+.chart-botanical-frame{position:absolute;inset:0;pointer-events:none;}
+.chart-sprig{position:absolute;display:block;width:46px;height:112px;background-image:url('./assets/botanical-sprig.svg'),url('./assets/gold-stars.svg');background-size:28px 112px,16px 83px;background-position:left bottom,right center;background-repeat:no-repeat;opacity:.9;}
+.chart-sprig.upper-left{left:3px;top:76px;}
+.chart-sprig.upper-right{right:3px;top:76px;transform:scaleX(-1);}
+.chart-sprig.lower-left{left:3px;bottom:6px;}
+.chart-sprig.lower-right{right:3px;bottom:6px;transform:scaleX(-1);}
+@media print{.chart-sprig{width:46px;height:97px;background-size:28px 97px,16px 76px;}.chart-sprig.upper-left,.chart-sprig.upper-right{top:60px;}}
