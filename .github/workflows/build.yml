@@ -22,6 +22,7 @@ jobs:
           node --experimental-strip-types scripts/houses.test.mjs
           node --experimental-strip-types scripts/events.test.mjs
           node --experimental-strip-types scripts/daily-guidance.test.mjs
+          node --experimental-strip-types scripts/weekly-guidance.test.mjs
       - name: Install browser test tools
         run: |
           npm install --no-save playwright
