@@ -91,6 +91,10 @@ export default function TransitChart({date,label,meaning}:{date:Date;label:strin
   const part = (type:string) => dateParts.find(p=>p.type===type)?.value;
   const shortTimestamp = `${part('month')}/${part('day')}（${part('weekday')}）${part('hour')}:${part('minute')}頃`;
   return <section className="symbol">
+    <div className="chart-botanical-frame" aria-hidden="true">
+      <span className="chart-sprig upper-left"/><span className="chart-sprig upper-right"/>
+      <span className="chart-sprig lower-left"/><span className="chart-sprig lower-right"/>
+    </div>
     <h3>WEEK’S SYMBOLIC DAY</h3>
     <p className="symbolic-event"><time dateTime={date.toISOString()} title={`${timestamp}（日本時間）`}>{shortTimestamp}</time><strong className="symbolic-event-name">{eventName}</strong></p>
     <p className="symbolic-meaning">（{eventMeaning}）</p>
