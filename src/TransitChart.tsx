@@ -41,15 +41,20 @@ export default function TransitChart({date,label,meaning}:{date:Date;label:strin
       ? Astronomy.EclipticGeoMoon(date).lon
       : Astronomy.Ecliptic(Astronomy.GeoVector(body,date,true)).elon;
     const minutes = Math.floor((longitude % 30) * 60);
-    return {name,symbol,longitude,description: `${signs[Math.floor(longitude / 30)]} ${Math.floor(minutes / 60)}°${String(minutes % 60).padStart(2,'0')}′`};
+    const degreeText = `${Math.floor(minutes / 60)}°${String(minutes % 60).padStart(2,'0')}′`;
+    return {name,symbol,longitude,degreeText,description: `${signs[Math.floor(longitude / 30)]} ${Math.floor(minutes / 60)}°${String(minutes % 60).padStart(2,'0')}′`};
   });
-  // Keep labels on their exact longitude; use radial lanes for close conjunctions.
-  const placed: {longitude:number;radius:number}[] = [];
+  // Spread nearby labels while keeping each leader anchored to the true longitude.
+  const placed: {x:number;y:number}[] = [];
+  const offsets = [0,...Array.from({length:22},(_,i)=>[(i+1)*8,-(i+1)*8]).flat(),180];
   const plotted = positions.map(position => {
-    let radius = 73;
-    while (placed.some(p => p.radius === radius && Math.abs(((p.longitude-position.longitude+540)%360)-180) < 17)) radius -= 17;
-    placed.push({longitude:position.longitude,radius});
-    return {...position,radius};
+    const candidates = offsets.flatMap(offset=>[70,56,42,28,14,0].map(radius=>point(position.longitude+offset,radius)));
+    const fits = (candidate:{x:number;y:number}) =>
+      Math.hypot(Math.abs(candidate.x-120)+16,Math.abs(candidate.y-120)+12)<87 &&
+      placed.every(other=>Math.abs(other.x-candidate.x)>=34||Math.abs(other.y-candidate.y)>=26);
+    const location = candidates.find(fits) || candidates[0];
+    placed.push(location);
+    return {...position,location};
   });
   const timestamp = new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',year:'numeric',month:'numeric',day:'numeric',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(date);
   const moonSign = signs[Math.floor(positions[1].longitude / 30)];
@@ -66,9 +71,8 @@ export default function TransitChart({date,label,meaning}:{date:Date;label:strin
       <circle cx="120" cy="120" r="115" fill="#fffdf5" stroke="#b69b68"/>
       <circle cx="120" cy="120" r="89" fill="none" stroke="#c9bb9a"/>
       {zodiacPaths.map((path,i) => {const a=point(i*30,89),b=point(i*30,115),t=point(i*30+15,102);return <g key={signs[i]}><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#c9b58c"/><g data-zodiac={signs[i]} transform={`translate(${t.x-7.5} ${t.y-7.5}) scale(.625)`} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><title>{signs[i]}</title><path d={path}/></g></g>})}
-      {plotted.map(p => {const a=point(p.longitude,86),b=point(p.longitude,p.radius+7),t=point(p.longitude,p.radius);return <g key={p.name} data-planet={p.name} data-longitude={p.longitude}><title>{p.name}：{p.description}</title><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#b69b68" strokeWidth=".6"/><text x={t.x} y={t.y} textAnchor="middle" dominantBaseline="central" fontSize="14" fill="#34465d">{p.symbol}</text></g>})}
+      {plotted.map(p => {const a=point(p.longitude,87),t=p.location;return <g key={p.name} data-planet={p.name} data-longitude={p.longitude} aria-label={`${p.name}：${p.description}`}><title>{p.name}：{p.description}</title><line x1={a.x} y1={a.y} x2={t.x} y2={t.y} stroke="#b69b68" strokeWidth=".5"/><circle cx={a.x} cy={a.y} r="1" fill="#b69b68"/><g className="planet-label" transform={`translate(${t.x} ${t.y})`}><rect x="-16" y="-12" width="32" height="24" rx="3" fill="#fffdf5"/><text x="0" y="-3" textAnchor="middle" dominantBaseline="central" fontSize="13" fill="currentColor">{p.symbol}</text><text className="planet-degree" x="0" y="8" textAnchor="middle" dominantBaseline="central" fontSize="7.5" fill="currentColor">{p.degreeText}</text></g></g>})}
     </svg></div>
-    <dl className="planet-positions">{positions.map(p=><div key={p.name}><dt>{p.symbol} {p.name}</dt><dd>{p.description}</dd></div>)}</dl>
-    <small>日本時間（JST）を基準とした天体配置（トロピカル方式）。意味は振り返りのヒントです。出生図・ハウスは含みません。月相の節目、週の最初のイベントの順で選び、該当がない週は月曜正午を表示します。</small>
+    <small title="出生図・ハウスは含みません。月相の節目、週の最初のイベントの順で選び、該当がない週は月曜正午を表示します。">地心・トロピカル方式／日本時間（JST）。<br/>意味は振り返りのヒントです。</small>
   </section>;
 }
