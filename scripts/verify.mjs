@@ -14,6 +14,18 @@ const checks=await page.evaluate(()=>{
 });
 fs.writeFileSync('artifacts/checks.json',JSON.stringify(checks,null,2));
 if(checks.days!==7||checks.hourLabels!==133||checks.firstHour!=='05:00'||checks.lastHour!=='23:00'||checks.reflectionSections!==4||Math.abs(checks.wheelWidth-checks.wheelHeight)>1)throw Error('Layout checks failed: '+JSON.stringify(checks));
+// A known full-moon week checks the calculated chart and week navigation.
+const weekPicker=page.getByLabel('表示したい日付');
+const originalWeek=await weekPicker.inputValue();
+await weekPicker.fill('2026-10-26');
+const chartTime=await page.locator('.symbol time').getAttribute('datetime');
+const positions=await page.locator('[data-planet]').evaluateAll(nodes=>nodes.map(node=>({name:node.getAttribute('data-planet'),longitude:Number(node.getAttribute('data-longitude'))})));
+const sun=positions.find(p=>p.name==='太陽'),moon=positions.find(p=>p.name==='月');
+if(positions.length!==10||positions.some(p=>!Number.isFinite(p.longitude)||p.longitude<0||p.longitude>=360)||!chartTime?.startsWith('2026-10-26')||!sun||!moon||Math.abs(Math.abs(sun.longitude-moon.longitude)-180)>.1)throw Error('Calculated transit chart check failed');
+await page.getByRole('button',{name:'次の週 ›'}).click();
+if(await page.locator('.symbol time').getAttribute('datetime')===chartTime||Number(await page.locator('[data-planet="月"]').getAttribute('data-longitude'))===moon.longitude)throw Error('Transit chart did not follow week navigation');
+await weekPicker.fill(originalWeek);
+console.log('Transit chart: ten valid positions, full-moon opposition and week navigation passed');
 await page.emulateMedia({media:'print'});
 await page.pdf({path:'artifacts/a4-landscape.pdf',format:'A4',landscape:true,printBackground:true,preferCSSPageSize:true});
 await browser.close();
