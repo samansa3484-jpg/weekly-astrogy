@@ -14,6 +14,10 @@ const checks=await page.evaluate(()=>{
 });
 fs.writeFileSync('artifacts/checks.json',JSON.stringify(checks,null,2));
 if(checks.days!==7||checks.hourLabels!==133||checks.firstHour!=='05:00'||checks.lastHour!=='23:00'||checks.reflectionSections!==4||Math.abs(checks.wheelWidth-checks.wheelHeight)>1)throw Error('Layout checks failed: '+JSON.stringify(checks));
+// Zodiac marks must remain monochrome vectors on systems with emoji fonts.
+const zodiacMarks=page.locator('[data-zodiac]');
+if(await zodiacMarks.count()!==12||await zodiacMarks.locator('path').count()!==12||await zodiacMarks.locator('text,image').count()!==0)throw Error('Zodiac marks must use vector paths');
+if(!await zodiacMarks.evaluateAll(nodes=>nodes.every(node=>getComputedStyle(node).stroke===getComputedStyle(node).color&&getComputedStyle(node).fill==='none')))throw Error('Zodiac marks must inherit the text color');
 // A known full-moon week checks the calculated chart and week navigation.
 const weekPicker=page.getByLabel('表示したい日付');
 const originalWeek=await weekPicker.inputValue();
