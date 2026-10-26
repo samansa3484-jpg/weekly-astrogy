@@ -83,3 +83,11 @@ export function eventsForJstDay(events:AstroEvent[],week:Date,day:number){
  return events.filter(event=>event.date.getTime()>=begin&&event.date.getTime()<end).sort((a,b)=>a.date.getTime()-b.date.getTime());
 }
 export const compactEventLabel=(event:AstroEvent)=>event.planets?`${event.planets[0]} ${event.aspectAngle}° ${event.planets[1]}`:event.label;
+
+export function jstClock(date:Date){
+ const local=new Date(date.getTime()+9*3600000);
+ return {hour:local.getUTCHours(),minute:local.getUTCMinutes()};
+}
+export function timelineForDay(events:AstroEvent[]){
+ return {beforeHours:events.filter(event=>jstClock(event.date).hour<5),hours:Array.from({length:19},(_,index)=>events.filter(event=>jstClock(event.date).hour===index+5))};
+}

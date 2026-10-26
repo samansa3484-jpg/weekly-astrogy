@@ -72,17 +72,19 @@ await verifyHouses();
 const verifyDailyEvents=async()=>{
  const valid=await page.locator('.week article').evaluateAll(nodes=>nodes.every(node=>{
   const day=node.querySelector('.date').textContent;
-  const slot=node.querySelector('.event-slot').getBoundingClientRect();
-  return [...node.querySelectorAll('.daily-event-row')].every(row=>{
-   const time=row.querySelector('time'),date=new Date(time.dateTime);
+  return [...node.querySelectorAll('[data-timeline-event]')].every(mark=>{
+   const date=new Date(mark.dataset.eventTime);
    const displayedDay=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Tokyo',month:'numeric',day:'numeric'}).format(date);
-   const displayedTime=new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(date);
-   const box=row.getBoundingClientRect();
-   return day===displayedDay&&time.textContent===displayedTime&&box.top>=slot.top-1&&box.bottom<=slot.bottom+1;
+   const local=new Date(date.getTime()+9*3600000),hour=local.getUTCHours(),minute=local.getUTCMinutes();
+   const row=mark.closest('[data-hour]');
+   const correctlyPlaced=hour<5?!!mark.closest('.before-hours-event'):row?.dataset.hour===String(hour)&&Number(mark.dataset.minute)===minute;
+   const box=mark.getBoundingClientRect();
+   const container=(hour<5?mark.closest('.before-hours-slot'):row)?.getBoundingClientRect();
+   return day===displayedDay&&correctlyPlaced&&mark.textContent===mark.dataset.eventSymbol+'\uFE0E'&&box.top>=container.top-1&&box.bottom<=container.bottom+1;
   });
  }));
- if(!valid)throw Error('Daily events must fit their columns and match JST dates/times');
- if(await page.getByLabel('天体イベントの仮表示').count())throw Error('Sample event cards must be removed');
+ if(!valid)throw Error('Timeline marks must match JST dates, hours and minutes without crossing rows');
+ if(await page.locator('.event-slot,.no-daily-event').count())throw Error('Repeated event cards and empty-day notices should be removed');
 };
 await verifyDailyEvents();
 const verifyPromptFit=async()=>{
@@ -107,7 +109,7 @@ const originalWeek=await weekPicker.inputValue();
 await weekPicker.fill('2026-10-26');
 if(await page.locator('.symbolic-event-name').textContent()!=='牡牛座満月'||!(await page.locator('.symbolic-event time').textContent()).includes('10/26（月）13:12頃')||!(await page.locator('.symbolic-meaning').textContent()).includes('気づきと収穫'))throw Error('Symbolic day caption must describe the Taurus full moon in JST');
 if(await page.locator('[data-first="太陽"][data-second="月"]').getAttribute('data-aspect')!=='180')throw Error('Full moon must show Sun–Moon opposition');
-if(await page.locator('.week article').nth(0).locator('.daily-event-row').count()!==2||await page.locator('.week article').nth(5).locator('[data-event-label="水星スクエア火星"]').count()!==1||await page.locator('.week article').nth(4).locator('.no-daily-event').count()!==1)throw Error('Known full-moon week daily events are incorrect');
+if(await page.locator('.week article').nth(0).locator('[data-timeline-event]').count()!==2||await page.locator('.week article').nth(5).locator('[data-event-label="水星スクエア火星"]').count()!==1||await page.locator('.week article').nth(4).locator('[data-timeline-event]').count()!==0)throw Error('Known full-moon week daily events are incorrect');
 await verifyDailyEvents();
 if(!(await page.locator('.morning-question').first().textContent()).includes('実り')||!(await page.locator('.night-question').first().textContent()).includes('実り'))throw Error('Full moon morning and night prompts should be paired');
 const release=page.getByRole('checkbox',{name:'RELEASE｜手放す',exact:true});
