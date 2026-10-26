@@ -619,3 +619,8 @@ aside section.symbol{background:linear-gradient(130deg,#fffdf9e8,#fcf9efe0);}
 .chart-sprig.lower-left{left:14px;bottom:10px;transform:rotate(-28deg);}
 .chart-sprig.lower-right{right:14px;bottom:10px;transform:scaleX(-1) rotate(-28deg);}
 @media print{.chart-sprig{width:54px;height:116px;background-size:35px 116px,18px 91px;}.chart-sprig.upper-left,.chart-sprig.upper-right{top:60px;}}
+
+/* Set the title and date low in a pale-blue sky, retaining the moon artwork. */
+.mast{display:flex;flex-direction:column;justify-content:flex-end;flex-shrink:0;padding-bottom:8px;background-color:#e1eff5;}
+.mast h1{margin-top:0;margin-bottom:4px;flex:none;}
+.mast small{margin-bottom:0;flex:none;}
