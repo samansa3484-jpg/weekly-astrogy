@@ -92,6 +92,13 @@ const verifyPromptFit=async()=>{
  })))throw Error('Morning and evening prompts must fit without covering writing space');
 };
 await verifyPromptFit();
+const verifyWeeklyContext=async()=>{
+ const items=page.locator('.weekly-flow-item');
+ if(await items.count()>4)throw Error('Weekly context should highlight at most four events');
+ for(const item of await items.all())if(!(await item.locator('time').getAttribute('datetime'))||!(await item.locator('.flow-explanation').textContent()).trim())throw Error('Each weekly event needs a real timestamp and explanation');
+ if(await page.locator('.weekly-good-for>p').count()!==5||!(await page.locator('.weekly-choice-note').textContent()).includes('自由に選んで'))throw Error('Five optional action hints should be offered');
+};
+await verifyWeeklyContext();
 // A known full-moon week checks the calculated chart and week navigation.
 const weekPicker=page.getByLabel('表示したい日付');
 const originalWeek=await weekPicker.inputValue();
@@ -125,10 +132,13 @@ await weekPicker.fill('2026-11-09');
 if(await page.locator('.symbolic-event-name').textContent()!=='蠍座新月'||!(await page.locator('.symbolic-meaning').textContent()).includes('願いの種'))throw Error('New moon caption is incorrect');
 if(await page.locator('[data-first="太陽"][data-second="月"]').getAttribute('data-aspect')!=='0')throw Error('New moon must show Sun–Moon conjunction');
 for(const date of ['2026-02-16','2026-06-15','2026-12-21','2020-01-06']){
- await weekPicker.fill(date);await verifyChartLabels();await verifyAspects();await verifyHouses();await verifyDailyEvents();await verifyPromptFit();
+ await weekPicker.fill(date);await verifyChartLabels();await verifyAspects();await verifyHouses();await verifyDailyEvents();await verifyPromptFit();await verifyWeeklyContext();
 }
 await weekPicker.fill(originalWeek);
 console.log('Transit chart: ten valid positions, full-moon opposition and week navigation passed');
+// Print real form values, including two-line evening and three-line weekly notes.
+const printSamples=[['action0','大切な予定を進める'],['slot0-0','朝の散歩'],['night0','できたことを認める\n気づきを次の一歩へ'],['reflection0','よかったこと\n新しく気づいたこと\n次の一歩へ']];
+for(const [name,value] of printSamples)await page.getByRole('textbox',{name,exact:true}).fill(value);
 await page.emulateMedia({media:'print'});
 await verifyHourlySpacing();
 await verifyChartLabels();
@@ -136,7 +146,20 @@ await verifyAspects();
 await verifyHouses();
 await verifyDailyEvents();
 await verifyPromptFit();
+await verifyWeeklyContext();
 if(!await page.evaluate(()=>document.querySelector('footer').getBoundingClientRect().bottom<=document.querySelector('.sheet').getBoundingClientRect().bottom))throw Error('Enlarged chart must leave the footer inside the printed page');
+if(await page.locator('.toolbar').isVisible())throw Error('Toolbar should not appear in print');
+if(!await page.evaluate(()=>{const sheet=document.querySelector('.sheet').getBoundingClientRect();return sheet.width<=document.body.clientWidth+1&&sheet.height<=document.body.clientHeight+1;}))throw Error('Printed sheet must fit inside the printable area');
+if(!await page.locator('.night-writing textarea,.refgrid textarea').evaluateAll(nodes=>nodes.every(node=>node.scrollHeight<=node.clientHeight+1)))throw Error('Printed sample notes should not be clipped');
+for(const [name,value] of printSamples)if(await page.getByRole('textbox',{name,exact:true}).inputValue()!==value)throw Error('Printed form value changed');
 await page.pdf({path:'artifacts/a4-landscape.pdf',format:'A4',landscape:true,printBackground:true,preferCSSPageSize:true});
+// Keep the longer-caption and ingress-heavy weeks in the print regression check.
+for(const date of ['2026-11-02','2026-11-09','2026-02-16']){
+ await page.emulateMedia({media:'screen'});await weekPicker.fill(date);
+ await page.emulateMedia({media:'print'});
+ await verifyPromptFit();await verifyWeeklyContext();await verifyHourlySpacing();
+ if(!await page.evaluate(()=>document.querySelector('footer').getBoundingClientRect().bottom<=document.querySelector('.sheet').getBoundingClientRect().bottom))throw Error('Printed content is clipped in '+date);
+ await page.pdf({path:`artifacts/print-${date}.pdf`,format:'A4',landscape:true,printBackground:true,preferCSSPageSize:true});
+}
 await browser.close();
 console.log(checks);
