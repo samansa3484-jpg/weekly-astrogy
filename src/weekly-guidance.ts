@@ -20,10 +20,20 @@ const guidanceByEvent:Record<string,{keyword:string;detail:string;good:string[];
  'ingress':{keyword:'新しい視点を取り入れる週',detail:'関心や取り組み方の変化に目を向けるテーマ。今の自分に合う方向を考えるヒントに。',good:['気になることを調べ、新しいやり方を知る','心に残ったことを、小さな体験につなげる','続けたいことと変えたいことを確かめる'],theme:'可能性を探す',question:'今、どんな新しい選択肢が見えていますか？'},
  'quiet':{keyword:'自分のペースを大切にする週',detail:'大きな節目の少ない週も、日々の小さな変化は選択のヒントに。今の気持ちやペースを確かめる時間に。',good:['心と体の調子を確かめ、今のペースを知る','自分が心地よく続けられる習慣を見つける','今日できた小さな一歩を振り返り、記録する'],theme:'自分のペースで',question:'今の自分にとって、心地よい一歩は何ですか？'}
 };
+const directionDescriptions:Record<string,[string,string,string]>={
+ '新月':['始める前に、負担になっている予定や決めつけを見直す','気になる願いや学びを言葉にし、新しい視点に触れる','心にある思いを、試せる小さな行動や準備に変える'],
+ '満月':['役目を終えた習慣や、抱えすぎた役割を見直す','経験から得た気づきや、これから育てたい思いを探る','受け取った実りを、次の小さな行動や表現につなげる'],
+ '上弦の月':['進み方を狭めている決めつけや、無理な予定を見直す','うまくいった工夫や、助けになる考え方を探る','選んだ工夫を一つ試し、自分に合う形を確かめる'],
+ '下弦の月':['今の自分に合わない習慣や、思い込みを見直す','続けたいことと手放したいことを、経験から探る','整理して生まれた余白に、次の一歩を思い描く'],
+ 'aspect':['人との比較や、応えすぎている期待を見直す','違う考えに触れ、自分の思いや判断の軸を探る','対話の気づきを、伝え方や小さな行動に生かす'],
+ 'ingress':['慣れたやり方や、今の関心に合わない習慣を見直す','気になる学びや新しい視点から、可能性を探る','試したい方法を一つ選び、小さな体験につなげる'],
+ 'quiet':['日々の小さな負担や、抱え込んでいる予定を見直す','心地よいペースや、自分が大切にしたいことを探る','今ある楽しみや気づきを、暮らしの小さな工夫に変える'],
+};
+const directionLabels=['RELEASE｜手放す','EXPLORE｜探究する','CREATE｜形にする'];
 export function weeklyGuidance(events:AstroEvent[]){
  const phase=events.find(e=>e.kind==='phase');
  const key=phase?.label||events.find(e=>e.kind==='aspect')?.kind||events.find(e=>e.kind==='ingress')?.kind||'quiet';
- return {...guidanceByEvent[key],good:[...guidanceByEvent[key].good,...extraActions[key]]};
+ return {...guidanceByEvent[key],good:[...guidanceByEvent[key].good,...extraActions[key]],directions:directionLabels.map((label,index)=>({label,description:directionDescriptions[key][index]}))};
 }
 
 // Highlight a readable selection; the daily columns retain the complete feed.

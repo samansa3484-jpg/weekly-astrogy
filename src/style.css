@@ -574,3 +574,23 @@ aside section::after { content:none !important; display:none !important; }
   .weekly-good-for p{font-size:12px;line-height:1.35;}
   .weekly-direction .check{line-height:1.25;}
 }
+
+/* Each direction offers a weekly reflection prompt beside its existing checkbox. */
+.weekly-direction .direction-choice{display:flex;align-items:flex-start;gap:5px;margin:5px 0;line-height:1.4;}
+.direction-choice input{flex:none;margin-top:3px;}
+.direction-choice>span{min-width:0;}
+.direction-choice strong{font-size:12px;font-weight:600;}
+.direction-description{display:block;font-size:12px;margin-top:1px;}
+@media print{
+  .weekly-direction{display:block;}
+  .weekly-direction .direction-choice{margin:2px 0;line-height:1.3;}
+  .direction-choice strong{font-size:10.5px;}
+  .direction-description{display:inline;font-size:10.5px;margin:0 0 0 5px;}
+}
+@media print{
+  .weekly-direction .direction-choice{margin:1px 0;}
+  .direction-choice input{margin:0;align-self:center;}
+  .weekly-direction h3{margin-bottom:2px;}
+  .weekly-good-for p{line-height:1.25;}
+  .sheet{grid-template-rows:1fr 36px;}
+}
