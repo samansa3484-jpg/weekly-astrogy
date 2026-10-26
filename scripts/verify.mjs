@@ -93,6 +93,8 @@ const verifyPromptFit=async()=>{
 };
 await verifyPromptFit();
 const verifyWeeklyContext=async()=>{
+ const directions=page.locator('.direction-description');
+ if(await directions.count()!==3||(await directions.allTextContents()).some(text=>!text.trim()))throw Error('All three weekly directions need explanations');
  const items=page.locator('.weekly-flow-item');
  if(await items.count()>3)throw Error('Weekly context should highlight at most three events');
  for(const item of await items.all())if(!(await item.locator('time').getAttribute('datetime'))||!(await item.locator('.flow-explanation').textContent()).trim())throw Error('Each weekly event needs a real timestamp and explanation');
@@ -108,11 +110,22 @@ if(await page.locator('[data-first="太陽"][data-second="月"]').getAttribute('
 if(await page.locator('.week article').nth(0).locator('.daily-event-row').count()!==2||await page.locator('.week article').nth(5).locator('[data-event-label="水星スクエア火星"]').count()!==1||await page.locator('.week article').nth(4).locator('.no-daily-event').count()!==1)throw Error('Known full-moon week daily events are incorrect');
 await verifyDailyEvents();
 if(!(await page.locator('.morning-question').first().textContent()).includes('実り')||!(await page.locator('.night-question').first().textContent()).includes('実り'))throw Error('Full moon morning and night prompts should be paired');
+const release=page.getByRole('checkbox',{name:'RELEASE｜手放す',exact:true});
+const fullMoonDirection=await page.locator('.direction-description').first().textContent();
+await release.check();
+await page.waitForFunction(()=>JSON.parse(localStorage.getItem('weekly-astrology-2026-10-26-v1')||'{}').check0==='yes');
+await page.reload();await weekPicker.fill('2026-10-26');
+if(!await release.isChecked())throw Error('Direction check should persist after reload');
 const chartTime=await page.locator('.symbol time').getAttribute('datetime');
 const positions=await page.locator('[data-planet]').evaluateAll(nodes=>nodes.map(node=>({name:node.getAttribute('data-planet'),longitude:Number(node.getAttribute('data-longitude'))})));
 const sun=positions.find(p=>p.name==='太陽'),moon=positions.find(p=>p.name==='月');
 if(positions.length!==10||positions.some(p=>!Number.isFinite(p.longitude)||p.longitude<0||p.longitude>=360)||!chartTime?.startsWith('2026-10-26')||!sun||!moon||Math.abs(Math.abs(sun.longitude-moon.longitude)-180)>.1)throw Error('Calculated transit chart check failed');
 await page.getByRole('button',{name:'次の週 ›'}).click();
+if(await release.isChecked())throw Error('Direction checks should be independent for each week');
+if(await page.locator('.direction-description').first().textContent()===fullMoonDirection)throw Error('Direction explanations should follow the weekly theme');
+await page.getByRole('button',{name:'‹ 前の週'}).click();
+if(!await release.isChecked())throw Error('Returning to a week should restore its direction checks');
+await release.uncheck();await page.getByRole('button',{name:'次の週 ›'}).click();
 if(await page.locator('.symbol time').getAttribute('datetime')===chartTime||Number(await page.locator('[data-planet="月"]').getAttribute('data-longitude'))===moon.longitude)throw Error('Transit chart did not follow week navigation');
 if(await page.locator('.symbolic-event-name').textContent()!=='獅子座下弦の月'||!(await page.locator('.symbolic-meaning').textContent()).includes('手放して整える'))throw Error('Symbolic day caption did not follow the lunar event');
 if(!(await page.locator('.morning-question').first().textContent()).includes('手放')||!(await page.locator('.night-question').first().textContent()).includes('手放'))throw Error('Last quarter morning and night prompts should be paired');
