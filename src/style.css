@@ -592,3 +592,20 @@ aside section::after { content:none !important; display:none !important; }
 .weekly-good-for h3{margin-right:-38px;}
 .weekly-good-for:after{display:none;}
 @media print{.weekly-good-for{padding-right:52px;}}
+
+/* Reference-inspired accents occupy dedicated margins, never writing fields. */
+.weekly-direction{padding-right:33px;background-image:url('./assets/gold-stars.svg'),linear-gradient(130deg,#fffdf9e8,#fcf9efe0);background-size:22px 112px,100% 100%;background-position:right 4px center,0 0;background-repeat:no-repeat;}
+.reflection{padding-right:46px;background-image:url('./assets/botanical-sprig.svg');background-repeat:no-repeat;background-size:34px 130px;background-position:right 4px bottom 4px;}
+.actions{position:relative;padding-right:48px;}
+.actions:after{position:absolute;right:9px;top:50%;transform:translateY(-50%);}
+@media print{.reflection{padding-right:42px;background-size:30px 120px;}.weekly-direction{padding-right:29px;}}
+
+/* Watercolor stays in the title's left margin; the words sit on unpainted paper. */
+.mast{background:#fffaf0 url('./assets/watercolor-moon.png') no-repeat left top;background-size:157px 105px;}
+.mast h1{margin-left:66px;margin-right:12px;font-size:26px;letter-spacing:1.4px;}
+.mast small{display:block;margin-left:65px;font-size:12px;}
+.mast-art{left:auto;right:0;width:50px;z-index:0;object-fit:cover;}
+.mast h1,.mast small{z-index:1;}
+.mast{background-image:url('./assets/watercolor-moon.png'),url('./assets/botanical-sprig.svg');background-size:157px 105px,25px 90px;background-position:left top,right 2px bottom;background-repeat:no-repeat;}
+.mast-art{display:none;}
+.mast h1{margin-right:27px;}
