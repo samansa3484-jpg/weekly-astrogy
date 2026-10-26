@@ -16,10 +16,11 @@ jobs:
         run: npm install
       - name: Build application
         run: npm run build
-      - name: Check aspect and Placidus calculations
+      - name: Check astronomical calculations
         run: |
           node --experimental-strip-types scripts/aspects.test.mjs
           node --experimental-strip-types scripts/houses.test.mjs
+          node --experimental-strip-types scripts/events.test.mjs
       - name: Install browser test tools
         run: |
           npm install --no-save playwright
