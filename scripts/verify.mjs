@@ -51,10 +51,10 @@ const verifyAspects=async()=>{
   }
   const nodes=[...document.querySelectorAll('[data-aspect]')];
   const actual=nodes.map(n=>`${n.dataset.first}-${n.dataset.second}-${n.dataset.aspect}`);
-  const colors=nodes.every(n=>getComputedStyle(n).stroke===({soft:'rgb(119, 150, 172)',hard:'rgb(170, 119, 117)',conjunction:'rgb(182, 155, 104)'})[n.classList[0].replace('aspect-','')]);
+  const colors=nodes.every(n=>getComputedStyle(n).stroke===({soft:'rgb(88, 169, 192)',hard:'rgb(213, 120, 124)',conjunction:'rgb(182, 155, 104)'})[n.classList[0].replace('aspect-','')]);
   return {expected:expected.sort(),actual:actual.sort(),colors};
  });
- if(JSON.stringify(result.expected)!==JSON.stringify(result.actual)||!result.colors)throw Error('Major aspects must match calculated separations and muted color categories');
+ if(JSON.stringify(result.expected)!==JSON.stringify(result.actual)||!result.colors)throw Error('Major aspects must match calculated separations and watercolor color categories');
 };
 await verifyAspects();
 const verifyHouses=async()=>{
