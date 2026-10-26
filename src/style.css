@@ -557,3 +557,20 @@ aside section::after { content:none !important; display:none !important; }
 .backup-message{border-left:3px solid #b69b68;padding:8px 12px;background:#f6f0e3;}
 .backup-dialog .backup-note{font-size:12px;color:#56646a;}
 @media print{.backup-dialog,.backup-dialog::backdrop{display:none!important;}}
+
+/* Full, two-sentence context keeps the printed reference's reading density. */
+.weekly-flow .flow-explanation{font-size:13px;line-height:1.5;}
+.weekly-good-for p{font-size:13px;line-height:1.5;}
+@media print{
+  .weekly-flow .flow-explanation{font-size:11.5px;line-height:1.35;}
+  .weekly-direction{display:grid;grid-template-columns:1fr 1fr;gap:2px 6px;}
+  .weekly-direction h3{grid-column:1/-1;}
+  .weekly-direction .check{font-size:12px;}
+}
+@media print{
+  .sheet{grid-template-columns:440px 1fr;grid-template-rows:1fr 40px;}
+  aside{gap:3px;}
+  .weekly-flow-item{margin:2px 0;}
+  .weekly-good-for p{font-size:12px;line-height:1.35;}
+  .weekly-direction .check{line-height:1.25;}
+}
