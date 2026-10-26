@@ -6,7 +6,7 @@ test('busy-week highlights retain lunar phases and ingresses without inventing e
  const input=[event(26,'aspect','A'),event(27,'aspect','B'),event(28,'aspect','C'),event(29,'aspect','D'),event(30,'ingress','太陽 蠍座へ'),event(31,'phase','満月')];
  const original=[...input];
  const selected=selectedWeeklyEvents(input);
- assert.equal(selected.length,4);
+ assert.equal(selected.length,3);
  assert.ok(selected.includes(input[4]));assert.ok(selected.includes(input[5]));
  assert.ok(selected.every(e=>input.includes(e)));
  assert.deepEqual(input,original);

@@ -94,7 +94,7 @@ const verifyPromptFit=async()=>{
 await verifyPromptFit();
 const verifyWeeklyContext=async()=>{
  const items=page.locator('.weekly-flow-item');
- if(await items.count()>4)throw Error('Weekly context should highlight at most four events');
+ if(await items.count()>3)throw Error('Weekly context should highlight at most three events');
  for(const item of await items.all())if(!(await item.locator('time').getAttribute('datetime'))||!(await item.locator('.flow-explanation').textContent()).trim())throw Error('Each weekly event needs a real timestamp and explanation');
  if(await page.locator('.weekly-good-for>p').count()!==5||!(await page.locator('.weekly-choice-note').textContent()).includes('自由に選んで'))throw Error('Five optional action hints should be offered');
 };

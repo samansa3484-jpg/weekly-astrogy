@@ -23,6 +23,7 @@ jobs:
           node --experimental-strip-types scripts/events.test.mjs
           node --experimental-strip-types scripts/daily-guidance.test.mjs
           node --experimental-strip-types scripts/weekly-guidance.test.mjs
+          node --experimental-strip-types scripts/backup.test.mjs
       - name: Install browser test tools
         run: |
           npm install --no-save playwright
@@ -33,6 +34,7 @@ jobs:
           (npm run preview -- --host 127.0.0.1 > /tmp/weekly-preview.log 2>&1 &)
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
           node scripts/verify.mjs
+          node scripts/verify-backup.mjs
       - name: Upload visual verification
         if: always()
         uses: actions/upload-artifact@v4
