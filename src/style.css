@@ -624,3 +624,6 @@ aside section.symbol{background:linear-gradient(130deg,#fffdf9e8,#fcf9efe0);}
 .mast{display:flex;flex-direction:column;justify-content:flex-end;flex-shrink:0;padding-bottom:8px;background-color:#e1eff5;}
 .mast h1{margin-top:0;margin-bottom:4px;flex:none;}
 .mast small{margin-bottom:0;flex:none;}
+
+/* Carry the watercolor sky's blue-lavender tones through the entire title panel. */
+.mast{background-color:#e5e8f1;background-image:url('./assets/watercolor-moon.png'),url('./assets/botanical-sprig.svg'),linear-gradient(125deg,#bccce1 0%,#d5ddef 35%,#e5e5f0 65%,#f2e9e5 100%);background-size:157px 105px,25px 90px,100% 100%;background-position:left top,right 2px bottom,0 0;background-repeat:no-repeat;}
