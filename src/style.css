@@ -613,9 +613,9 @@ aside section::after { content:none !important; display:none !important; }
 /* Botanical corners frame the wheel without covering its axes or labels. */
 aside section.symbol{background:linear-gradient(130deg,#fffdf9e8,#fcf9efe0);}
 .chart-botanical-frame{position:absolute;inset:0;pointer-events:none;}
-.chart-sprig{position:absolute;display:block;width:46px;height:112px;background-image:url('./assets/botanical-sprig.svg'),url('./assets/gold-stars.svg');background-size:28px 112px,16px 83px;background-position:left bottom,right center;background-repeat:no-repeat;opacity:.9;}
-.chart-sprig.upper-left{left:3px;top:76px;}
-.chart-sprig.upper-right{right:3px;top:76px;transform:scaleX(-1);}
-.chart-sprig.lower-left{left:3px;bottom:6px;}
-.chart-sprig.lower-right{right:3px;bottom:6px;transform:scaleX(-1);}
-@media print{.chart-sprig{width:46px;height:97px;background-size:28px 97px,16px 76px;}.chart-sprig.upper-left,.chart-sprig.upper-right{top:60px;}}
+.chart-sprig{position:absolute;display:block;width:54px;height:134px;background-image:url('./assets/botanical-sprig.svg'),url('./assets/gold-stars.svg');background-size:35px 134px,18px 100px;background-position:left bottom,right center;background-repeat:no-repeat;opacity:.9;}
+.chart-sprig.upper-left{left:14px;top:76px;transform:rotate(28deg);}
+.chart-sprig.upper-right{right:14px;top:76px;transform:scaleX(-1) rotate(28deg);}
+.chart-sprig.lower-left{left:14px;bottom:10px;transform:rotate(-28deg);}
+.chart-sprig.lower-right{right:14px;bottom:10px;transform:scaleX(-1) rotate(-28deg);}
+@media print{.chart-sprig{width:54px;height:116px;background-size:35px 116px,18px 91px;}.chart-sprig.upper-left,.chart-sprig.upper-right{top:60px;}}
