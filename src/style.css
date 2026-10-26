@@ -430,3 +430,6 @@ aside section::after { content:none !important; display:none !important; }
 .moon-phase-icon {width:19px;height:19px;flex:0 0 19px;vertical-align:middle;display:block}
 .moon-sign {gap:4px}
 @media print {.moon-phase-icon{width:19px;height:19px}}
+
+/* Week picker stays in the on-screen toolbar; the printable sheet is unchanged. */
+.week-navigation{display:flex;align-items:center;gap:5px;flex-wrap:wrap}.week-navigation button{white-space:nowrap}.week-navigation input[type=date]{font-size:12px;padding:5px;border:1px solid #b9c7cf;border-radius:4px;background:#fff;color:#34465d}@media print{.week-navigation{display:none!important}}
