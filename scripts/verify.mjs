@@ -57,6 +57,18 @@ const verifyAspects=async()=>{
  if(JSON.stringify(result.expected)!==JSON.stringify(result.actual)||!result.colors)throw Error('Major aspects must match calculated separations and muted color categories');
 };
 await verifyAspects();
+const verifyHouses=async()=>{
+ const result=await page.evaluate(()=>{
+  const houses=[...document.querySelectorAll('[data-house]')].map(n=>Number(n.dataset.cusp));
+  const asc=document.querySelector('[data-angle="ASC"] line');
+  const mc=document.querySelector('[data-angle="MC"] line');
+  return {houses,ascX:asc.x1.baseVal.value,ascY:asc.y1.baseVal.value,mcY:mc.y1.baseVal.value,caption:document.querySelector('.symbol>small').textContent};
+ });
+ if(result.houses.length!==12||result.houses.some(x=>!Number.isFinite(x)||x<0||x>=360))throw Error('Placidus chart needs twelve valid cusps');
+ for(let i=0;i<6;i++)if(Math.abs(((result.houses[i+6]-result.houses[i]+360)%360)-180)>1e-6)throw Error('Opposite house cusps must differ by 180 degrees');
+ if(Math.abs(result.ascX-31)>.001||Math.abs(result.ascY-120)>.001||result.mcY>=120||!result.caption.includes('東京基準・プラシーダス'))throw Error('Tokyo Placidus chart must put ASC at left and MC above');
+};
+await verifyHouses();
 // A known full-moon week checks the calculated chart and week navigation.
 const weekPicker=page.getByLabel('表示したい日付');
 const originalWeek=await weekPicker.inputValue();
@@ -74,7 +86,7 @@ await weekPicker.fill('2026-11-09');
 if(await page.locator('.symbolic-event-name').textContent()!=='蠍座新月'||!(await page.locator('.symbolic-meaning').textContent()).includes('願いの種'))throw Error('New moon caption is incorrect');
 if(await page.locator('[data-first="太陽"][data-second="月"]').getAttribute('data-aspect')!=='0')throw Error('New moon must show Sun–Moon conjunction');
 for(const date of ['2026-02-16','2026-06-15','2026-12-21','2020-01-06']){
- await weekPicker.fill(date);await verifyChartLabels();await verifyAspects();
+ await weekPicker.fill(date);await verifyChartLabels();await verifyAspects();await verifyHouses();
 }
 await weekPicker.fill(originalWeek);
 console.log('Transit chart: ten valid positions, full-moon opposition and week navigation passed');
@@ -82,6 +94,7 @@ await page.emulateMedia({media:'print'});
 await verifyHourlySpacing();
 await verifyChartLabels();
 await verifyAspects();
+await verifyHouses();
 if(!await page.evaluate(()=>document.querySelector('footer').getBoundingClientRect().bottom<=document.querySelector('.sheet').getBoundingClientRect().bottom))throw Error('Enlarged chart must leave the footer inside the printed page');
 await page.pdf({path:'artifacts/a4-landscape.pdf',format:'A4',landscape:true,printBackground:true,preferCSSPageSize:true});
 await browser.close();

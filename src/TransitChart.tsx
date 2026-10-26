@@ -1,5 +1,6 @@
 import * as Astronomy from 'astronomy-engine';
 import {majorAspects} from './aspects';
+import {placidusHouses} from './houses';
 
 const signs = ['牡羊座','牡牛座','双子座','蟹座','獅子座','乙女座','天秤座','蠍座','射手座','山羊座','水瓶座','魚座'];
 // Vector strokes avoid platform emoji fonts and always inherit the text color.
@@ -24,8 +25,8 @@ const bodies = [
   [Astronomy.Body.Saturn,'土星','♄'], [Astronomy.Body.Uranus,'天王星','♅'],
   [Astronomy.Body.Neptune,'海王星','♆'], [Astronomy.Body.Pluto,'冥王星','♇'],
 ] as const;
-const point = (longitude: number, radius: number) => {
-  const angle = (180 - longitude) * Math.PI / 180;
+const wheelPoint = (longitude: number, radius: number) => {
+  const angle = (180 + longitude) * Math.PI / 180;
   return {x: 120 + radius * Math.cos(angle), y: 120 - radius * Math.sin(angle)};
 };
 
@@ -37,6 +38,17 @@ const phaseMeanings:Record<string,string> = {
 };
 
 export default function TransitChart({date,label,meaning}:{date:Date;label:string;meaning:string}) {
+  // Tokyo city-centre coordinates; the selected event instant is already in UTC.
+  const houses = placidusHouses(date,35.6762,139.6503);
+  const point = (longitude:number,radius:number) => wheelPoint(longitude-houses.asc,radius);
+  const formatPosition = (longitude:number) => {
+    const minutes=Math.floor(longitude%30*60);
+    return `${signs[Math.floor(longitude/30)]}${Math.floor(minutes/60)}°${String(minutes%60).padStart(2,'0')}′`;
+  };
+  const axes = [
+    {name:'ASC',longitude:houses.asc}, {name:'IC',longitude:houses.cusps[3]},
+    {name:'DSC',longitude:houses.cusps[6]}, {name:'MC',longitude:houses.mc},
+  ];
   const positions = bodies.map(([body,name,symbol]) => {
     const longitude = body === Astronomy.Body.Moon
       ? Astronomy.EclipticGeoMoon(date).lon
@@ -49,15 +61,28 @@ export default function TransitChart({date,label,meaning}:{date:Date;label:strin
   // Spread nearby labels while keeping each leader anchored to the true longitude.
   const placed: {x:number;y:number}[] = [];
   const offsets = [0,...Array.from({length:22},(_,i)=>[(i+1)*8,-(i+1)*8]).flat(),180];
-  const plotted = positions.map(position => {
-    const candidates = offsets.flatMap(offset=>[70,56,42,28,14,0].map(radius=>point(position.longitude+offset,radius)));
+  let needsCompactLayout = false;
+  let plotted = positions.map(position => {
+    const candidates = offsets.flatMap(offset=>[58,44,28,14,0].map(radius=>point(position.longitude+offset,radius)));
     const fits = (candidate:{x:number;y:number}) =>
-      Math.hypot(Math.abs(candidate.x-120)+16,Math.abs(candidate.y-120)+12)<87 &&
+      Math.hypot(Math.abs(candidate.x-120)+16,Math.abs(candidate.y-120)+12)<74 &&
       placed.every(other=>Math.abs(other.x-candidate.x)>=34||Math.abs(other.y-candidate.y)>=26);
-    const location = candidates.find(fits) || candidates[0];
+    const candidate = candidates.find(fits);
+    if(!candidate)needsCompactLayout=true;
+    const location = candidate || candidates[0];
     placed.push(location);
     return {...position,location};
   });
+  if(needsCompactLayout){
+    // Ten non-overlapping slots fit inside the house-number ring even in a stellium.
+    const available=[...Array.from({length:8},(_,i)=>wheelPoint(i*45,54)),{x:120,y:106},{x:120,y:134}];
+    plotted=positions.map(position=>{
+      const ideal=point(position.longitude,58);
+      let best=0;
+      available.forEach((slot,i)=>{if(Math.hypot(slot.x-ideal.x,slot.y-ideal.y)<Math.hypot(available[best].x-ideal.x,available[best].y-ideal.y))best=i;});
+      return {...position,location:available.splice(best,1)[0]};
+    });
+  }
   const timestamp = new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',year:'numeric',month:'numeric',day:'numeric',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(date);
   const moonSign = signs[Math.floor(positions[1].longitude / 30)];
   const eventName = Object.hasOwn(phaseMeanings,label) ? `${moonSign}${label}` : label;
@@ -69,22 +94,28 @@ export default function TransitChart({date,label,meaning}:{date:Date;label:strin
     <h3>WEEK’S SYMBOLIC DAY</h3>
     <p className="symbolic-event"><time dateTime={date.toISOString()} title={`${timestamp}（日本時間）`}>{shortTimestamp}</time><strong className="symbolic-event-name">{eventName}</strong></p>
     <p className="symbolic-meaning">（{eventMeaning}）</p>
-    <div className="wheel transit-wheel"><svg viewBox="0 0 240 240" width="100%" height="100%" role="img" aria-label={`${timestamp}の天体配置。牡羊座0度を左に固定した地心黄道図`}>
+    <div className="wheel transit-wheel"><svg viewBox="-15 -15 270 270" width="100%" height="100%" role="img" aria-label={`${timestamp}、東京基準のプラシーダス方式の天体配置。ASCを左に配置`}>
       <circle cx="120" cy="120" r="115" fill="#fffdf5" stroke="#b69b68"/>
       <circle cx="120" cy="120" r="89" fill="none" stroke="#c9bb9a"/>
       {zodiacPaths.map((path,i) => {const a=point(i*30,89),b=point(i*30,115),t=point(i*30+15,102);return <g key={signs[i]}><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#c9b58c"/><g data-zodiac={signs[i]} transform={`translate(${t.x-7.5} ${t.y-7.5}) scale(.625)`} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><title>{signs[i]}</title><path d={path}/></g></g>})}
+      <circle cx="120" cy="120" r="76" fill="none" stroke="#d3c8af" strokeWidth=".5"/>
+      <g className="chart-houses">
+        {houses.cusps.map((cusp,i)=>{const start=point(cusp,76),end=point(cusp,89);const next=houses.cusps[(i+1)%12];const middle=cusp+((next-cusp+360)%360)/2;const number=point(middle,82);return <g key={i} data-house={i+1} data-cusp={cusp}><title>{i+1}ハウス：{formatPosition(cusp)}</title><line x1={start.x} y1={start.y} x2={end.x} y2={end.y} stroke="#baae96" strokeWidth=".6"/><text x={number.x} y={number.y} textAnchor="middle" dominantBaseline="central" fontSize="6" fill="currentColor">{i+1}</text></g>})}
+        {axes.map(axis=>{const a=point(axis.longitude,89),b=point(axis.longitude,117),t=point(axis.longitude,124);return <g key={axis.name} data-angle={axis.name} data-longitude={axis.longitude}><title>{axis.name}：{formatPosition(axis.longitude)}</title><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#a59373" strokeWidth=".8"/><text x={t.x} y={t.y} textAnchor="middle" dominantBaseline="central" fontSize="6.5" fill="currentColor">{axis.name}</text></g>})}
+      </g>
       <g className="chart-aspects" fill="none" strokeWidth=".85" strokeOpacity=".7" strokeLinecap="round">
-        {aspects.map(aspect=>{const a=point(aspect.first.longitude,83),b=point(aspect.second.longitude,83);return <g key={`${aspect.first.name}-${aspect.second.name}`} className={`aspect-${aspect.kind}`} data-aspect={aspect.angle} data-first={aspect.first.name} data-second={aspect.second.name} data-orb={aspect.orb}>
+        {aspects.map(aspect=>{const a=point(aspect.first.longitude,72),b=point(aspect.second.longitude,72);return <g key={`${aspect.first.name}-${aspect.second.name}`} className={`aspect-${aspect.kind}`} data-aspect={aspect.angle} data-first={aspect.first.name} data-second={aspect.second.name} data-orb={aspect.orb}>
           <title>{aspect.first.name} — {aspect.second.name}：{aspect.name}（{aspect.angle}°／オーブ{aspect.orb.toFixed(2)}°）</title>
           <line x1={a.x} y1={a.y} x2={b.x} y2={b.y}/>
           {aspect.kind==='conjunction'&&<circle cx={a.x} cy={a.y} r="2"/>}
         </g>})}
       </g>
-      {plotted.map(p => {const a=point(p.longitude,87),t=p.location;return <g key={p.name} data-planet={p.name} data-longitude={p.longitude} aria-label={`${p.name}：${p.description}`}><title>{p.name}：{p.description}</title><line x1={a.x} y1={a.y} x2={t.x} y2={t.y} stroke="#b69b68" strokeWidth=".5"/><circle cx={a.x} cy={a.y} r="1" fill="#b69b68"/><g className="planet-label" transform={`translate(${t.x} ${t.y})`}><rect x="-16" y="-12" width="32" height="24" rx="3" fill="none"/><text x="0" y="-3" textAnchor="middle" dominantBaseline="central" fontSize="13" fill="currentColor">{p.symbol}</text><text className="planet-degree" x="0" y="8" textAnchor="middle" dominantBaseline="central" fontSize="7.5" fill="currentColor">{p.degreeText}</text></g></g>})}
+      {plotted.map(p => {const a=point(p.longitude,75),t=p.location;return <g key={p.name} data-planet={p.name} data-longitude={p.longitude} aria-label={`${p.name}：${p.description}`}><title>{p.name}：{p.description}</title><line x1={a.x} y1={a.y} x2={t.x} y2={t.y} stroke="#b69b68" strokeWidth=".5"/><circle cx={a.x} cy={a.y} r="1" fill="#b69b68"/><g className="planet-label" transform={`translate(${t.x} ${t.y})`}><rect x="-16" y="-12" width="32" height="24" rx="3" fill="none"/><text x="0" y="-3" textAnchor="middle" dominantBaseline="central" fontSize="13" fill="currentColor">{p.symbol}</text><text className="planet-degree" x="0" y="8" textAnchor="middle" dominantBaseline="central" fontSize="7.5" fill="currentColor">{p.degreeText}</text></g></g>})}
     </svg></div>
+    <p className="chart-axes">ASC {formatPosition(houses.asc)}　MC {formatPosition(houses.mc)}</p>
     <div className="aspect-legend" aria-label="主要アスペクトの色分け。各角度から6度以内を表示">
       <span className="aspect-soft">60°・120°</span><span className="aspect-hard">90°・180°</span><span className="aspect-conjunction">合 0°</span><small>（オーブ±6°）</small>
     </div>
-    <small title="出生図・ハウスは含みません。月相の節目、週の最初のイベントの順で選び、該当がない週は月曜正午を表示します。">地心・トロピカル方式／日本時間（JST）。<br/>意味は振り返りのヒントです。</small>
+    <small title="東京（北緯35.6762度・東経139.6503度）のトランジット図です。月相の節目、週の最初のイベントの順で選び、該当がない週は月曜正午を表示します。">東京基準・プラシーダス／日本時間（JST）。<br/>意味は振り返りのヒントです。</small>
   </section>;
 }
