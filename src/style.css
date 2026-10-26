@@ -453,3 +453,11 @@ aside section::after { content:none !important; display:none !important; }
 @media print{
   .symbolic-event time,.symbolic-event-name,.symbol p.symbolic-meaning{font-size:11px;}
 }
+
+/* Share spare schedule height across all 19 hours instead of leaving a gap at 23:00. */
+.hours{display:flex;flex-direction:column;}
+.hour{flex:1 0 19px;height:auto;min-height:19px;}
+.hour input{height:auto;align-self:stretch;}
+@media print{
+  .hour{flex-basis:20px;min-height:20px;}
+}

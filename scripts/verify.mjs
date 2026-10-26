@@ -14,6 +14,15 @@ const checks=await page.evaluate(()=>{
 });
 fs.writeFileSync('artifacts/checks.json',JSON.stringify(checks,null,2));
 if(checks.days!==7||checks.hourLabels!==133||checks.firstHour!=='05:00'||checks.lastHour!=='23:00'||checks.reflectionSections!==4||Math.abs(checks.wheelWidth-checks.wheelHeight)>1)throw Error('Layout checks failed: '+JSON.stringify(checks));
+const verifyHourlySpacing=async()=>{
+ const columns=await page.locator('.week article').evaluateAll(nodes=>nodes.map(node=>{
+  const rows=[...node.querySelectorAll('.hour')].map(row=>row.getBoundingClientRect());
+  const night=node.querySelector('.night').getBoundingClientRect();
+  return {heights:rows.map(row=>row.height),gap:night.top-rows.at(-1).bottom};
+ }));
+ if(columns.some(column=>Math.abs(column.gap)>1||Math.max(...column.heights)-Math.min(...column.heights)>1))throw Error('Hours must evenly fill the space up to the evening reflection');
+};
+await verifyHourlySpacing();
 // Zodiac marks must remain monochrome vectors on systems with emoji fonts.
 const zodiacMarks=page.locator('[data-zodiac]');
 if(await zodiacMarks.count()!==12||await zodiacMarks.locator('path').count()!==12||await zodiacMarks.locator('text,image').count()!==0)throw Error('Zodiac marks must use vector paths');
@@ -51,6 +60,7 @@ for(const date of ['2026-02-16','2026-06-15','2026-12-21','2020-01-06']){
 await weekPicker.fill(originalWeek);
 console.log('Transit chart: ten valid positions, full-moon opposition and week navigation passed');
 await page.emulateMedia({media:'print'});
+await verifyHourlySpacing();
 await verifyChartLabels();
 if(!await page.evaluate(()=>document.querySelector('footer').getBoundingClientRect().bottom<=document.querySelector('.sheet').getBoundingClientRect().bottom))throw Error('Enlarged chart must leave the footer inside the printed page');
 await page.pdf({path:'artifacts/a4-landscape.pdf',format:'A4',landscape:true,printBackground:true,preferCSSPageSize:true});
