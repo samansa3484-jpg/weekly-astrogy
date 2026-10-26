@@ -37,7 +37,7 @@ export default function TransitChart({date,label}:{date:Date;label:string}) {
     <div className="wheel transit-wheel"><svg viewBox="0 0 240 240" width="100%" height="100%" role="img" aria-label={`${timestamp}の天体配置。牡羊座0度を左に固定した地心黄道図`}>
       <circle cx="120" cy="120" r="115" fill="#fffdf5" stroke="#b69b68"/>
       <circle cx="120" cy="120" r="89" fill="none" stroke="#c9bb9a"/>
-      {glyphs.map((glyph,i) => {const a=point(i*30,89),b=point(i*30,115),t=point(i*30+15,102);return <g key={glyph}><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#c9b58c"/><text x={t.x} y={t.y} textAnchor="middle" dominantBaseline="central" fontSize="15" fill="#755e58">{glyph}</text></g>})}
+      {glyphs.map((glyph,i) => {const a=point(i*30,89),b=point(i*30,115),t=point(i*30+15,102);return <g key={glyph}><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#c9b58c"/><text x={t.x} y={t.y} textAnchor="middle" dominantBaseline="central" fontSize="15" fill="currentColor" style={{fontVariantEmoji:'text',fontFamily:'"Segoe UI Symbol", "Apple Symbols", "DejaVu Sans", sans-serif'}}>{glyph+'\uFE0E'}</text></g>})}
       {plotted.map(p => {const a=point(p.longitude,86),b=point(p.longitude,p.radius+7),t=point(p.longitude,p.radius);return <g key={p.name} data-planet={p.name} data-longitude={p.longitude}><title>{p.name}：{p.description}</title><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#b69b68" strokeWidth=".6"/><text x={t.x} y={t.y} textAnchor="middle" dominantBaseline="central" fontSize="14" fill="#34465d">{p.symbol}</text></g>})}
     </svg></div>
     <dl className="planet-positions">{positions.map(p=><div key={p.name}><dt>{p.symbol} {p.name}</dt><dd>{p.description}</dd></div>)}</dl>
