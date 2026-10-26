@@ -433,3 +433,18 @@ aside section::after { content:none !important; display:none !important; }
 
 /* Week picker stays in the on-screen toolbar; the printable sheet is unchanged. */
 .week-navigation{display:flex;align-items:center;gap:5px;flex-wrap:wrap}.week-navigation button{white-space:nowrap}.week-navigation input[type=date]{font-size:12px;padding:5px;border:1px solid #b9c7cf;border-radius:4px;background:#fff;color:#34465d}@media print{.week-navigation{display:none!important}}
+
+/* Calculated transit chart */
+.wheel.transit-wheel{padding:0;border:0;background:none;width:205px;max-width:100%;}
+.chart-time{font-size:11px;}
+.planet-positions{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;margin:8px 0;text-align:left;font-size:10px;}
+.planet-positions>div{display:flex;justify-content:space-between;gap:3px;}
+.planet-positions dt,.planet-positions dd{margin:0;}
+.planet-positions dd{white-space:nowrap;}
+@media print {
+  .symbol{display:grid;grid-template-columns:145px 1fr;align-content:start;column-gap:6px;}
+  .symbol h3,.symbol>p{grid-column:1/-1;}
+  .symbol .transit-wheel{width:145px;margin:4px auto;}
+  .symbol .planet-positions{grid-template-columns:1fr;align-content:center;gap:2px;font-size:10px;margin:4px 0;}
+  .symbol>small{grid-column:1/-1;font-size:9px;line-height:1.2;}
+}
