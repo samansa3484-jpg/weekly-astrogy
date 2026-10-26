@@ -609,3 +609,6 @@ aside section::after { content:none !important; display:none !important; }
 .mast{background-image:url('./assets/watercolor-moon.png'),url('./assets/botanical-sprig.svg');background-size:157px 105px,25px 90px;background-position:left top,right 2px bottom;background-repeat:no-repeat;}
 .mast-art{display:none;}
 .mast h1{margin-right:27px;}
+
+/* Lower-left chart corner: narrow botanical strokes and quiet gold stars. */
+aside section.symbol{background-image:url('./assets/botanical-sprig.svg'),url('./assets/gold-stars.svg'),linear-gradient(130deg,#fffdf9e8,#fcf9efe0);background-size:35px 114px,18px 78px,100% 100%;background-position:left 4px bottom 5px,left 42px bottom 9px,0 0;background-repeat:no-repeat;}
