@@ -113,9 +113,6 @@ export default function TransitChart({date,label,meaning}:{date:Date;label:strin
       {plotted.map(p => {const a=point(p.longitude,75),t=p.location;return <g key={p.name} data-planet={p.name} data-longitude={p.longitude} aria-label={`${p.name}：${p.description}`}><title>{p.name}：{p.description}</title><line x1={a.x} y1={a.y} x2={t.x} y2={t.y} stroke="#b69b68" strokeWidth=".5"/><circle cx={a.x} cy={a.y} r="1" fill="#b69b68"/><g className="planet-label" transform={`translate(${t.x} ${t.y})`}><rect x="-16" y="-12" width="32" height="24" rx="3" fill="none"/><text x="0" y="-3" textAnchor="middle" dominantBaseline="central" fontSize="13" fill="currentColor">{p.symbol}</text><text className="planet-degree" x="0" y="8" textAnchor="middle" dominantBaseline="central" fontSize="7.5" fill="currentColor">{p.degreeText}</text></g></g>})}
     </svg></div>
     <p className="chart-axes">ASC {formatPosition(houses.asc)}　MC {formatPosition(houses.mc)}</p>
-    <div className="aspect-legend" aria-label="主要アスペクトの色分け。各角度から6度以内を表示">
-      <span className="aspect-soft">60°・120°</span><span className="aspect-hard">90°・180°</span><span className="aspect-conjunction">合 0°</span><small>（オーブ±6°）</small>
-    </div>
-    <small title="東京（北緯35.6762度・東経139.6503度）のトランジット図です。月相の節目、週の最初のイベントの順で選び、該当がない週は月曜正午を表示します。">東京基準・プラシーダス／日本時間（JST）。<br/>意味は振り返りのヒントです。</small>
+
   </section>;
 }
