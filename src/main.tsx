@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react';import{createRoot}from'react-dom/client';import './style.css';
-const days=['MON','TUE','WED','THU','FRI','SAT','SUN'],
+const days=['MON','TUE','WED','THU','FRI','SAT','SUN'];
 
 // Weeks start on Monday in Japan; use UTC calendar dates to avoid timezone drift.
 const weekMonday=(date:Date)=>{const d=new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate()));d.setUTCDate(d.getUTCDate()-(d.getUTCDay()+6)%7);return d;};
