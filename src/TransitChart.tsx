@@ -28,7 +28,14 @@ const point = (longitude: number, radius: number) => {
   return {x: 120 + radius * Math.cos(angle), y: 120 - radius * Math.sin(angle)};
 };
 
-export default function TransitChart({date,label}:{date:Date;label:string}) {
+const phaseMeanings:Record<string,string> = {
+  '新月':'願いの種をまき、新しい一歩を選ぶタイミング',
+  '上弦の月':'方向を確かめ、小さな行動を重ねるタイミング',
+  '満月':'気づきと収穫のタイミング',
+  '下弦の月':'経験を振り返り、手放して整えるタイミング',
+};
+
+export default function TransitChart({date,label,meaning}:{date:Date;label:string;meaning:string}) {
   const positions = bodies.map(([body,name,symbol]) => {
     const longitude = body === Astronomy.Body.Moon
       ? Astronomy.EclipticGeoMoon(date).lon
@@ -45,9 +52,16 @@ export default function TransitChart({date,label}:{date:Date;label:string}) {
     return {...position,radius};
   });
   const timestamp = new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',year:'numeric',month:'numeric',day:'numeric',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(date);
+  const moonSign = signs[Math.floor(positions[1].longitude / 30)];
+  const eventName = Object.hasOwn(phaseMeanings,label) ? `${moonSign}${label}` : label;
+  const eventMeaning = phaseMeanings[label] || meaning;
+  const dateParts = new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',month:'numeric',day:'numeric',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(date);
+  const part = (type:string) => dateParts.find(p=>p.type===type)?.value;
+  const shortTimestamp = `${part('month')}/${part('day')}（${part('weekday')}）${part('hour')}:${part('minute')}頃`;
   return <section className="symbol">
     <h3>WEEK’S SYMBOLIC DAY</h3>
-    <p>{label}</p><p className="chart-time"><time dateTime={date.toISOString()}>{timestamp}（日本時間）</time></p>
+    <p className="symbolic-event"><time dateTime={date.toISOString()} title={`${timestamp}（日本時間）`}>{shortTimestamp}</time><strong className="symbolic-event-name">{eventName}</strong></p>
+    <p className="symbolic-meaning">（{eventMeaning}）</p>
     <div className="wheel transit-wheel"><svg viewBox="0 0 240 240" width="100%" height="100%" role="img" aria-label={`${timestamp}の天体配置。牡羊座0度を左に固定した地心黄道図`}>
       <circle cx="120" cy="120" r="115" fill="#fffdf5" stroke="#b69b68"/>
       <circle cx="120" cy="120" r="89" fill="none" stroke="#c9bb9a"/>
@@ -55,6 +69,6 @@ export default function TransitChart({date,label}:{date:Date;label:string}) {
       {plotted.map(p => {const a=point(p.longitude,86),b=point(p.longitude,p.radius+7),t=point(p.longitude,p.radius);return <g key={p.name} data-planet={p.name} data-longitude={p.longitude}><title>{p.name}：{p.description}</title><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#b69b68" strokeWidth=".6"/><text x={t.x} y={t.y} textAnchor="middle" dominantBaseline="central" fontSize="14" fill="#34465d">{p.symbol}</text></g>})}
     </svg></div>
     <dl className="planet-positions">{positions.map(p=><div key={p.name}><dt>{p.symbol} {p.name}</dt><dd>{p.description}</dd></div>)}</dl>
-    <small>地球から見た天体の位置（トロピカル方式）。出生図・ハウスは含みません。月相の節目、週の最初のイベントの順で選び、該当がない週は月曜正午を表示します。</small>
+    <small>日本時間（JST）を基準とした天体配置（トロピカル方式）。意味は振り返りのヒントです。出生図・ハウスは含みません。月相の節目、週の最初のイベントの順で選び、該当がない週は月曜正午を表示します。</small>
   </section>;
 }

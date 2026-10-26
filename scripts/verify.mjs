@@ -22,12 +22,16 @@ if(!await zodiacMarks.evaluateAll(nodes=>nodes.every(node=>getComputedStyle(node
 const weekPicker=page.getByLabel('表示したい日付');
 const originalWeek=await weekPicker.inputValue();
 await weekPicker.fill('2026-10-26');
+if(await page.locator('.symbolic-event-name').textContent()!=='牡牛座満月'||!(await page.locator('.symbolic-event time').textContent()).includes('10/26（月）13:12頃')||!(await page.locator('.symbolic-meaning').textContent()).includes('気づきと収穫'))throw Error('Symbolic day caption must describe the Taurus full moon in JST');
 const chartTime=await page.locator('.symbol time').getAttribute('datetime');
 const positions=await page.locator('[data-planet]').evaluateAll(nodes=>nodes.map(node=>({name:node.getAttribute('data-planet'),longitude:Number(node.getAttribute('data-longitude'))})));
 const sun=positions.find(p=>p.name==='太陽'),moon=positions.find(p=>p.name==='月');
 if(positions.length!==10||positions.some(p=>!Number.isFinite(p.longitude)||p.longitude<0||p.longitude>=360)||!chartTime?.startsWith('2026-10-26')||!sun||!moon||Math.abs(Math.abs(sun.longitude-moon.longitude)-180)>.1)throw Error('Calculated transit chart check failed');
 await page.getByRole('button',{name:'次の週 ›'}).click();
 if(await page.locator('.symbol time').getAttribute('datetime')===chartTime||Number(await page.locator('[data-planet="月"]').getAttribute('data-longitude'))===moon.longitude)throw Error('Transit chart did not follow week navigation');
+if(await page.locator('.symbolic-event-name').textContent()!=='獅子座下弦の月'||!(await page.locator('.symbolic-meaning').textContent()).includes('手放して整える'))throw Error('Symbolic day caption did not follow the lunar event');
+await weekPicker.fill('2026-11-09');
+if(await page.locator('.symbolic-event-name').textContent()!=='蠍座新月'||!(await page.locator('.symbolic-meaning').textContent()).includes('願いの種'))throw Error('New moon caption is incorrect');
 await weekPicker.fill(originalWeek);
 console.log('Transit chart: ten valid positions, full-moon opposition and week navigation passed');
 await page.emulateMedia({media:'print'});
