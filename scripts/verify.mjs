@@ -62,11 +62,11 @@ const verifyHouses=async()=>{
   const houses=[...document.querySelectorAll('[data-house]')].map(n=>Number(n.dataset.cusp));
   const asc=document.querySelector('[data-angle="ASC"] line');
   const mc=document.querySelector('[data-angle="MC"] line');
-  return {houses,ascX:asc.x1.baseVal.value,ascY:asc.y1.baseVal.value,mcY:mc.y1.baseVal.value,caption:document.querySelector('.symbol>small').textContent};
+  return {houses,ascX:asc.x1.baseVal.value,ascY:asc.y1.baseVal.value,mcY:mc.y1.baseVal.value,caption:document.querySelector('.transit-wheel svg').getAttribute('aria-label')};
  });
  if(result.houses.length!==12||result.houses.some(x=>!Number.isFinite(x)||x<0||x>=360))throw Error('Placidus chart needs twelve valid cusps');
  for(let i=0;i<6;i++)if(Math.abs(((result.houses[i+6]-result.houses[i]+360)%360)-180)>1e-6)throw Error('Opposite house cusps must differ by 180 degrees');
- if(Math.abs(result.ascX-31)>.001||Math.abs(result.ascY-120)>.001||result.mcY>=120||!result.caption.includes('東京基準・プラシーダス'))throw Error('Tokyo Placidus chart must put ASC at left and MC above');
+ if(Math.abs(result.ascX-31)>.001||Math.abs(result.ascY-120)>.001||result.mcY>=120||!result.caption.includes('東京基準のプラシーダス'))throw Error('Tokyo Placidus chart must put ASC at left and MC above');
 };
 await verifyHouses();
 const verifyDailyEvents=async()=>{
