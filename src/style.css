@@ -413,3 +413,11 @@ aside section::after { content:none !important; display:none !important; }
 .dayhead {padding-top:5px}
 .dayhead h4 {margin-top:2px}
 @media print {.moon-sign{height:30px;min-height:30px;font-size:10px}}
+
+/* Compact date/weekday on one baseline; free vertical room for the astrology. */
+.date-line {display:flex;align-items:baseline;justify-content:center;gap:1px;height:32px;white-space:nowrap}
+.date-line .date {font-size:22px;line-height:1.2}
+.date-line .weekday {font-family:var(--jp-textbook-bold);font-size:12px;font-weight:700;color:#34465d}
+.moon-sign {height:27px;min-height:27px}
+.dayhead h4 {margin-top:5px}
+@media print {.date-line{height:32px}.moon-sign{height:27px;min-height:27px}}
