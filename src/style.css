@@ -383,3 +383,12 @@ aside section::after { content:none !important; display:none !important; }
  .astro-event {print-color-adjust:exact;-webkit-print-color-adjust:exact}
  .dayhead h4 {margin:3px 0 4px;padding-bottom:4px;min-height:30px}
 }
+
+/* Compact, two-line event cards: no repeated demo disclaimer inside cards.
+   Keep reserved header space aligned across all seven days. */
+.event-slot { height:43px; }
+.astro-event { min-height:0; max-width:132px; padding:4px 2px 3px; }
+.astro-event-title { font-size:10px; line-height:1.3; }
+.astro-event-meaning { font-size:9px; line-height:1.35; }
+.dayhead h4 { margin-top:3px; }
+@media print { .event-slot {height:43px} .astro-event {min-height:0;padding:4px 2px 3px} }
