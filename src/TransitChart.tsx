@@ -1,4 +1,5 @@
 import * as Astronomy from 'astronomy-engine';
+import {majorAspects} from './aspects';
 
 const signs = ['牡羊座','牡牛座','双子座','蟹座','獅子座','乙女座','天秤座','蠍座','射手座','山羊座','水瓶座','魚座'];
 // Vector strokes avoid platform emoji fonts and always inherit the text color.
@@ -44,6 +45,7 @@ export default function TransitChart({date,label,meaning}:{date:Date;label:strin
     const degreeText = `${Math.floor(minutes / 60)}°${String(minutes % 60).padStart(2,'0')}′`;
     return {name,symbol,longitude,degreeText,description: `${signs[Math.floor(longitude / 30)]} ${Math.floor(minutes / 60)}°${String(minutes % 60).padStart(2,'0')}′`};
   });
+  const aspects = majorAspects(positions);
   // Spread nearby labels while keeping each leader anchored to the true longitude.
   const placed: {x:number;y:number}[] = [];
   const offsets = [0,...Array.from({length:22},(_,i)=>[(i+1)*8,-(i+1)*8]).flat(),180];
@@ -71,8 +73,18 @@ export default function TransitChart({date,label,meaning}:{date:Date;label:strin
       <circle cx="120" cy="120" r="115" fill="#fffdf5" stroke="#b69b68"/>
       <circle cx="120" cy="120" r="89" fill="none" stroke="#c9bb9a"/>
       {zodiacPaths.map((path,i) => {const a=point(i*30,89),b=point(i*30,115),t=point(i*30+15,102);return <g key={signs[i]}><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#c9b58c"/><g data-zodiac={signs[i]} transform={`translate(${t.x-7.5} ${t.y-7.5}) scale(.625)`} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><title>{signs[i]}</title><path d={path}/></g></g>})}
-      {plotted.map(p => {const a=point(p.longitude,87),t=p.location;return <g key={p.name} data-planet={p.name} data-longitude={p.longitude} aria-label={`${p.name}：${p.description}`}><title>{p.name}：{p.description}</title><line x1={a.x} y1={a.y} x2={t.x} y2={t.y} stroke="#b69b68" strokeWidth=".5"/><circle cx={a.x} cy={a.y} r="1" fill="#b69b68"/><g className="planet-label" transform={`translate(${t.x} ${t.y})`}><rect x="-16" y="-12" width="32" height="24" rx="3" fill="#fffdf5"/><text x="0" y="-3" textAnchor="middle" dominantBaseline="central" fontSize="13" fill="currentColor">{p.symbol}</text><text className="planet-degree" x="0" y="8" textAnchor="middle" dominantBaseline="central" fontSize="7.5" fill="currentColor">{p.degreeText}</text></g></g>})}
+      <g className="chart-aspects" fill="none" strokeWidth=".85" strokeOpacity=".7" strokeLinecap="round">
+        {aspects.map(aspect=>{const a=point(aspect.first.longitude,83),b=point(aspect.second.longitude,83);return <g key={`${aspect.first.name}-${aspect.second.name}`} className={`aspect-${aspect.kind}`} data-aspect={aspect.angle} data-first={aspect.first.name} data-second={aspect.second.name} data-orb={aspect.orb}>
+          <title>{aspect.first.name} — {aspect.second.name}：{aspect.name}（{aspect.angle}°／オーブ{aspect.orb.toFixed(2)}°）</title>
+          <line x1={a.x} y1={a.y} x2={b.x} y2={b.y}/>
+          {aspect.kind==='conjunction'&&<circle cx={a.x} cy={a.y} r="2"/>}
+        </g>})}
+      </g>
+      {plotted.map(p => {const a=point(p.longitude,87),t=p.location;return <g key={p.name} data-planet={p.name} data-longitude={p.longitude} aria-label={`${p.name}：${p.description}`}><title>{p.name}：{p.description}</title><line x1={a.x} y1={a.y} x2={t.x} y2={t.y} stroke="#b69b68" strokeWidth=".5"/><circle cx={a.x} cy={a.y} r="1" fill="#b69b68"/><g className="planet-label" transform={`translate(${t.x} ${t.y})`}><rect x="-16" y="-12" width="32" height="24" rx="3" fill="none"/><text x="0" y="-3" textAnchor="middle" dominantBaseline="central" fontSize="13" fill="currentColor">{p.symbol}</text><text className="planet-degree" x="0" y="8" textAnchor="middle" dominantBaseline="central" fontSize="7.5" fill="currentColor">{p.degreeText}</text></g></g>})}
     </svg></div>
+    <div className="aspect-legend" aria-label="主要アスペクトの色分け。各角度から6度以内を表示">
+      <span className="aspect-soft">60°・120°</span><span className="aspect-hard">90°・180°</span><span className="aspect-conjunction">合 0°</span><small>（オーブ±6°）</small>
+    </div>
     <small title="出生図・ハウスは含みません。月相の節目、週の最初のイベントの順で選び、該当がない週は月曜正午を表示します。">地心・トロピカル方式／日本時間（JST）。<br/>意味は振り返りのヒントです。</small>
   </section>;
 }

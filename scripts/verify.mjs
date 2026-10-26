@@ -40,11 +40,29 @@ const verifyChartLabels=async()=>{
 };
 await verifyChartLabels();
 if(checks.wheelWidth<300)throw Error('The screen chart should use the space freed by its legend');
+const verifyAspects=async()=>{
+ const result=await page.evaluate(()=>{
+  const planets=[...document.querySelectorAll('[data-planet]')].map(n=>({name:n.dataset.planet,longitude:Number(n.dataset.longitude)}));
+  const expected=[];
+  for(let i=0;i<planets.length;i++)for(let j=i+1;j<planets.length;j++){
+   const gap=Math.abs(planets[i].longitude-planets[j].longitude);
+   const separation=Math.min(gap,360-gap);
+   for(const angle of [0,60,90,120,180])if(Math.abs(separation-angle)<=6)expected.push(`${planets[i].name}-${planets[j].name}-${angle}`);
+  }
+  const nodes=[...document.querySelectorAll('[data-aspect]')];
+  const actual=nodes.map(n=>`${n.dataset.first}-${n.dataset.second}-${n.dataset.aspect}`);
+  const colors=nodes.every(n=>getComputedStyle(n).stroke===({soft:'rgb(119, 150, 172)',hard:'rgb(170, 119, 117)',conjunction:'rgb(182, 155, 104)'})[n.classList[0].replace('aspect-','')]);
+  return {expected:expected.sort(),actual:actual.sort(),colors};
+ });
+ if(JSON.stringify(result.expected)!==JSON.stringify(result.actual)||!result.colors)throw Error('Major aspects must match calculated separations and muted color categories');
+};
+await verifyAspects();
 // A known full-moon week checks the calculated chart and week navigation.
 const weekPicker=page.getByLabel('表示したい日付');
 const originalWeek=await weekPicker.inputValue();
 await weekPicker.fill('2026-10-26');
 if(await page.locator('.symbolic-event-name').textContent()!=='牡牛座満月'||!(await page.locator('.symbolic-event time').textContent()).includes('10/26（月）13:12頃')||!(await page.locator('.symbolic-meaning').textContent()).includes('気づきと収穫'))throw Error('Symbolic day caption must describe the Taurus full moon in JST');
+if(await page.locator('[data-first="太陽"][data-second="月"]').getAttribute('data-aspect')!=='180')throw Error('Full moon must show Sun–Moon opposition');
 const chartTime=await page.locator('.symbol time').getAttribute('datetime');
 const positions=await page.locator('[data-planet]').evaluateAll(nodes=>nodes.map(node=>({name:node.getAttribute('data-planet'),longitude:Number(node.getAttribute('data-longitude'))})));
 const sun=positions.find(p=>p.name==='太陽'),moon=positions.find(p=>p.name==='月');
@@ -54,14 +72,16 @@ if(await page.locator('.symbol time').getAttribute('datetime')===chartTime||Numb
 if(await page.locator('.symbolic-event-name').textContent()!=='獅子座下弦の月'||!(await page.locator('.symbolic-meaning').textContent()).includes('手放して整える'))throw Error('Symbolic day caption did not follow the lunar event');
 await weekPicker.fill('2026-11-09');
 if(await page.locator('.symbolic-event-name').textContent()!=='蠍座新月'||!(await page.locator('.symbolic-meaning').textContent()).includes('願いの種'))throw Error('New moon caption is incorrect');
+if(await page.locator('[data-first="太陽"][data-second="月"]').getAttribute('data-aspect')!=='0')throw Error('New moon must show Sun–Moon conjunction');
 for(const date of ['2026-02-16','2026-06-15','2026-12-21','2020-01-06']){
- await weekPicker.fill(date);await verifyChartLabels();
+ await weekPicker.fill(date);await verifyChartLabels();await verifyAspects();
 }
 await weekPicker.fill(originalWeek);
 console.log('Transit chart: ten valid positions, full-moon opposition and week navigation passed');
 await page.emulateMedia({media:'print'});
 await verifyHourlySpacing();
 await verifyChartLabels();
+await verifyAspects();
 if(!await page.evaluate(()=>document.querySelector('footer').getBoundingClientRect().bottom<=document.querySelector('.sheet').getBoundingClientRect().bottom))throw Error('Enlarged chart must leave the footer inside the printed page');
 await page.pdf({path:'artifacts/a4-landscape.pdf',format:'A4',landscape:true,printBackground:true,preferCSSPageSize:true});
 await browser.close();
