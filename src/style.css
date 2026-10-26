@@ -11,8 +11,7 @@
 .crescent{color:#b99a64;font-size:43px}
 aside section{background:linear-gradient(130deg,#fffdf9e8,#fcf9efe0);border-color:#b9c9cc}
 aside section:after{content:"✧ ❦";font-size:21px;opacity:.75}
-aside section:nth-of-type(1):before,aside section:nth-of-type(3):before,aside section:nth-of-type(4):before,.reflection:after{content:"❧";position:absolute;right:3px;bottom:3px;font-size:48px;line-height:1;color:#9db3a9;opacity:.46;pointer-events:none;transform:rotate(-23deg)}
-aside section:nth-of-type(3):before{font-size:65px;color:#a9b8d1}
+aside section:nth-of-type(1):before,aside section:nth-of-type(4):before,.reflection:after{content:"❧";position:absolute;right:3px;bottom:3px;font-size:48px;line-height:1;color:#9db3a9;opacity:.46;pointer-events:none;transform:rotate(-23deg)}
 aside section:nth-of-type(4):before{font-size:40px}
 aside section h3,.reflection h2{color:#2f496b;letter-spacing:.25px}
 .actions{background:linear-gradient(100deg,#fefbf3,#f8f5ea);border-radius:6px}
@@ -475,11 +474,11 @@ aside section::after { content:none !important; display:none !important; }
 /* Reserve two readable lines for the paired evening prompt. */
 .night-question{flex-basis:36px;min-height:36px;max-height:36px;font-size:11px;line-height:1.4;}
 
-/* A printer-safe A4 page: the 1480 × 1047 layout fits inside 3 mm margins. */
+/* Exact A4 aspect ratio: 1480 × (1480 × 210 / 297), scaled uniformly at 96 dpi. */
 @media print{
-  @page{size:A4 landscape;margin:3mm;}
-  html,body{width:291mm!important;height:204mm!important;}
-  .sheet{transform:scale(.736)!important;}
+  @page{size:A4 landscape;margin:0;}
+  html,body{width:297mm!important;height:210mm!important;}
+  .sheet{height:1046.464647px!important;min-height:1046.464647px!important;transform:scale(.7584801021)!important;}
   .hour time{font-size:13px;}
   .hour input{font-size:15px;}
   .night-question{font-size:12px;flex-basis:40px;min-height:40px;max-height:40px;line-height:1.35;}

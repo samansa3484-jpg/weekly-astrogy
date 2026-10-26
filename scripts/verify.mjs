@@ -164,6 +164,10 @@ await verifyPromptFit();
 await verifyWeeklyContext();
 if(!await page.evaluate(()=>document.querySelector('footer').getBoundingClientRect().bottom<=document.querySelector('.sheet').getBoundingClientRect().bottom))throw Error('Enlarged chart must leave the footer inside the printed page');
 if(await page.locator('.toolbar').isVisible())throw Error('Toolbar should not appear in print');
+if(!await page.evaluate(()=>{
+ const rect=document.querySelector('.sheet').getBoundingClientRect();
+ return Math.abs(rect.left)<.05&&Math.abs(rect.top)<.05&&Math.abs(rect.width-297*96/25.4)<.05&&Math.abs(rect.height-210*96/25.4)<.05;
+}))throw Error('Printed planner must fill A4 width and height without right or bottom whitespace');
 if(!await page.evaluate(()=>{const sheet=document.querySelector('.sheet').getBoundingClientRect();return sheet.width<=document.body.clientWidth+1&&sheet.height<=document.body.clientHeight+1;}))throw Error('Printed sheet must fit inside the printable area');
 if(!await page.locator('.night-writing textarea,.refgrid textarea').evaluateAll(nodes=>nodes.every(node=>node.scrollHeight<=node.clientHeight+1)))throw Error('Printed sample notes should not be clipped');
 for(const [name,value] of printSamples)if(await page.getByRole('textbox',{name,exact:true}).inputValue()!==value)throw Error('Printed form value changed');
