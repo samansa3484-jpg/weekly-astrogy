@@ -14,10 +14,32 @@ const checks=await page.evaluate(()=>{
 });
 fs.writeFileSync('artifacts/checks.json',JSON.stringify(checks,null,2));
 if(checks.days!==7||checks.hourLabels!==133||checks.firstHour!=='05:00'||checks.lastHour!=='23:00'||checks.reflectionSections!==4||Math.abs(checks.wheelWidth-checks.wheelHeight)>1)throw Error('Layout checks failed: '+JSON.stringify(checks));
+const verifyHourlySpacing=async()=>{
+ const columns=await page.locator('.week article').evaluateAll(nodes=>nodes.map(node=>{
+  const rows=[...node.querySelectorAll('.hour')].map(row=>row.getBoundingClientRect());
+  const night=node.querySelector('.night').getBoundingClientRect();
+  return {heights:rows.map(row=>row.height),gap:night.top-rows.at(-1).bottom};
+ }));
+ if(columns.some(column=>Math.abs(column.gap)>1||Math.max(...column.heights)-Math.min(...column.heights)>1))throw Error('Hours must evenly fill the space up to the evening reflection');
+};
+await verifyHourlySpacing();
 // Zodiac marks must remain monochrome vectors on systems with emoji fonts.
 const zodiacMarks=page.locator('[data-zodiac]');
 if(await zodiacMarks.count()!==12||await zodiacMarks.locator('path').count()!==12||await zodiacMarks.locator('text,image').count()!==0)throw Error('Zodiac marks must use vector paths');
 if(!await zodiacMarks.evaluateAll(nodes=>nodes.every(node=>getComputedStyle(node).stroke===getComputedStyle(node).color&&getComputedStyle(node).fill==='none')))throw Error('Zodiac marks must inherit the text color');
+const verifyChartLabels=async()=>{
+ const labels=await page.locator('[data-planet]').evaluateAll(nodes=>nodes.map(node=>{
+   const box=node.querySelector('.planet-label rect').getBoundingClientRect();
+   const longitude=Number(node.getAttribute('data-longitude'));
+   const minutes=Math.floor(longitude%30*60);
+   return {degree:node.querySelector('.planet-degree').textContent,expected:`${Math.floor(minutes/60)}°${String(minutes%60).padStart(2,'0')}′`,x:box.x,y:box.y,right:box.right,bottom:box.bottom};
+ }));
+ if(labels.length!==10||labels.some(label=>label.degree!==label.expected))throw Error('All ten planets need their calculated degrees inside the chart');
+ if(labels.some((a,i)=>labels.slice(i+1).some(b=>a.x<b.right&&a.right>b.x&&a.y<b.bottom&&a.bottom>b.y)))throw Error('Planet labels overlap');
+ if(await page.locator('.planet-positions').count())throw Error('External degree list should be removed');
+};
+await verifyChartLabels();
+if(checks.wheelWidth<300)throw Error('The screen chart should use the space freed by its legend');
 // A known full-moon week checks the calculated chart and week navigation.
 const weekPicker=page.getByLabel('表示したい日付');
 const originalWeek=await weekPicker.inputValue();
@@ -32,9 +54,15 @@ if(await page.locator('.symbol time').getAttribute('datetime')===chartTime||Numb
 if(await page.locator('.symbolic-event-name').textContent()!=='獅子座下弦の月'||!(await page.locator('.symbolic-meaning').textContent()).includes('手放して整える'))throw Error('Symbolic day caption did not follow the lunar event');
 await weekPicker.fill('2026-11-09');
 if(await page.locator('.symbolic-event-name').textContent()!=='蠍座新月'||!(await page.locator('.symbolic-meaning').textContent()).includes('願いの種'))throw Error('New moon caption is incorrect');
+for(const date of ['2026-02-16','2026-06-15','2026-12-21','2020-01-06']){
+ await weekPicker.fill(date);await verifyChartLabels();
+}
 await weekPicker.fill(originalWeek);
 console.log('Transit chart: ten valid positions, full-moon opposition and week navigation passed');
 await page.emulateMedia({media:'print'});
+await verifyHourlySpacing();
+await verifyChartLabels();
+if(!await page.evaluate(()=>document.querySelector('footer').getBoundingClientRect().bottom<=document.querySelector('.sheet').getBoundingClientRect().bottom))throw Error('Enlarged chart must leave the footer inside the printed page');
 await page.pdf({path:'artifacts/a4-landscape.pdf',format:'A4',landscape:true,printBackground:true,preferCSSPageSize:true});
 await browser.close();
 console.log(checks);
