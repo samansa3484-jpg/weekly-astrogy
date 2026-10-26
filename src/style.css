@@ -425,3 +425,8 @@ aside section::after { content:none !important; display:none !important; }
 /* Give the date and English weekday a deliberate, quiet visual separation. */
 .date-line { gap:7px; }
 @media print { .date-line {gap:7px} }
+
+/* Small illustrated lunar phase beside the moon sign, like the original planner. */
+.moon-phase-icon {width:19px;height:19px;flex:0 0 19px;vertical-align:middle;display:block}
+.moon-sign {gap:4px}
+@media print {.moon-phase-icon{width:19px;height:19px}}
