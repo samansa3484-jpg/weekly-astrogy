@@ -6,8 +6,8 @@ const nights=['手放せたことは？','心が和らいだ瞬間は？','丁�
 // Layout-only samples. Do not present these as calculated astronomical events.
 // Sample sign labels for layout only; replace with verified JST ephemeris later.
 const sampleMoonSigns=[
-  '月 in 獅子座','月 in 獅子座','獅子座 → 乙女座（11:11〜）',
-  '月 in 乙女座','月 in 乙女座','乙女座 → 天秤座（時刻未計算）','月 in 天秤座'
+  '獅子座','獅子座','獅子座 → 乙女座（11:11〜）',
+  '乙女座','乙女座','乙女座 → 天秤座（時刻未計算）','天秤座'
 ];
 const sampleEvents:Record<number,{symbol:string;name:string;meaning:string}>={
   0:{symbol:'◐',name:'月相イベント',meaning:'見直しのきっかけ'},
