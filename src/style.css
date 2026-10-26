@@ -487,3 +487,6 @@ aside section::after { content:none !important; display:none !important; }
 .daily-event-row time{flex:none;font-size:9px;font-variant-numeric:tabular-nums;}
 .daily-event-row>span{overflow-wrap:anywhere;}
 .no-daily-event{font-size:9px;color:#7b7e79;}
+
+/* Reserve two readable lines for the paired evening prompt. */
+.night-question{flex-basis:36px;min-height:36px;max-height:36px;font-size:11px;line-height:1.4;}

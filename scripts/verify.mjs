@@ -85,6 +85,13 @@ const verifyDailyEvents=async()=>{
  if(await page.getByLabel('天体イベントの仮表示').count())throw Error('Sample event cards must be removed');
 };
 await verifyDailyEvents();
+const verifyPromptFit=async()=>{
+ if(!await page.locator('.night-question,.morning-question').evaluateAll(nodes=>nodes.every(node=>{
+  const range=document.createRange();range.selectNodeContents(node);
+  return node.classList.contains('night-question')?range.getBoundingClientRect().height<=node.getBoundingClientRect().height+1:node.getBoundingClientRect().bottom<=node.closest('article').querySelector('.hours').getBoundingClientRect().top+1;
+ })))throw Error('Morning and evening prompts must fit without covering writing space');
+};
+await verifyPromptFit();
 // A known full-moon week checks the calculated chart and week navigation.
 const weekPicker=page.getByLabel('表示したい日付');
 const originalWeek=await weekPicker.inputValue();
@@ -93,6 +100,7 @@ if(await page.locator('.symbolic-event-name').textContent()!=='牡牛座満月'|
 if(await page.locator('[data-first="太陽"][data-second="月"]').getAttribute('data-aspect')!=='180')throw Error('Full moon must show Sun–Moon opposition');
 if(await page.locator('.week article').nth(0).locator('.daily-event-row').count()!==2||await page.locator('.week article').nth(5).locator('[data-event-label="水星スクエア火星"]').count()!==1||await page.locator('.week article').nth(4).locator('.no-daily-event').count()!==1)throw Error('Known full-moon week daily events are incorrect');
 await verifyDailyEvents();
+if(!(await page.locator('.morning-question').first().textContent()).includes('実り')||!(await page.locator('.night-question').first().textContent()).includes('実り'))throw Error('Full moon morning and night prompts should be paired');
 const chartTime=await page.locator('.symbol time').getAttribute('datetime');
 const positions=await page.locator('[data-planet]').evaluateAll(nodes=>nodes.map(node=>({name:node.getAttribute('data-planet'),longitude:Number(node.getAttribute('data-longitude'))})));
 const sun=positions.find(p=>p.name==='太陽'),moon=positions.find(p=>p.name==='月');
@@ -100,11 +108,24 @@ if(positions.length!==10||positions.some(p=>!Number.isFinite(p.longitude)||p.lon
 await page.getByRole('button',{name:'次の週 ›'}).click();
 if(await page.locator('.symbol time').getAttribute('datetime')===chartTime||Number(await page.locator('[data-planet="月"]').getAttribute('data-longitude'))===moon.longitude)throw Error('Transit chart did not follow week navigation');
 if(await page.locator('.symbolic-event-name').textContent()!=='獅子座下弦の月'||!(await page.locator('.symbolic-meaning').textContent()).includes('手放して整える'))throw Error('Symbolic day caption did not follow the lunar event');
+if(!(await page.locator('.morning-question').first().textContent()).includes('手放')||!(await page.locator('.night-question').first().textContent()).includes('手放'))throw Error('Last quarter morning and night prompts should be paired');
+if(await page.locator('.morning-question').nth(1).textContent()===await page.locator('.morning-question').nth(3).textContent())throw Error('Quiet-day questions should vary');
+const nightField=page.getByRole('textbox',{name:'night0',exact:true});
+await nightField.fill('問いの更新後も残す振り返り');
+await page.waitForFunction(()=>JSON.parse(localStorage.getItem('weekly-astrology-2026-11-02-v1')||'{}').night0==='問いの更新後も残す振り返り');
+await page.reload();
+await weekPicker.fill('2026-11-02');
+if(await nightField.inputValue()!=='問いの更新後も残す振り返り')throw Error('Evening entries should persist across reload');
+await page.getByRole('button',{name:'次の週 ›'}).click();
+if(await nightField.inputValue()!=='')throw Error('Different weeks must keep separate entries');
+await page.getByRole('button',{name:'‹ 前の週'}).click();
+if(await nightField.inputValue()!=='問いの更新後も残す振り返り')throw Error('Week navigation must preserve the evening entry');
+await nightField.fill('');
 await weekPicker.fill('2026-11-09');
 if(await page.locator('.symbolic-event-name').textContent()!=='蠍座新月'||!(await page.locator('.symbolic-meaning').textContent()).includes('願いの種'))throw Error('New moon caption is incorrect');
 if(await page.locator('[data-first="太陽"][data-second="月"]').getAttribute('data-aspect')!=='0')throw Error('New moon must show Sun–Moon conjunction');
 for(const date of ['2026-02-16','2026-06-15','2026-12-21','2020-01-06']){
- await weekPicker.fill(date);await verifyChartLabels();await verifyAspects();await verifyHouses();await verifyDailyEvents();
+ await weekPicker.fill(date);await verifyChartLabels();await verifyAspects();await verifyHouses();await verifyDailyEvents();await verifyPromptFit();
 }
 await weekPicker.fill(originalWeek);
 console.log('Transit chart: ten valid positions, full-moon opposition and week navigation passed');
@@ -114,6 +135,7 @@ await verifyChartLabels();
 await verifyAspects();
 await verifyHouses();
 await verifyDailyEvents();
+await verifyPromptFit();
 if(!await page.evaluate(()=>document.querySelector('footer').getBoundingClientRect().bottom<=document.querySelector('.sheet').getBoundingClientRect().bottom))throw Error('Enlarged chart must leave the footer inside the printed page');
 await page.pdf({path:'artifacts/a4-landscape.pdf',format:'A4',landscape:true,printBackground:true,preferCSSPageSize:true});
 await browser.close();
